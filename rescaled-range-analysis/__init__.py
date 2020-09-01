@@ -122,4 +122,3 @@ if __name__ == '__main__':
     H, c, data = __compute_Hc(series)
 
     print("H={:.4f}, c={:.4f}".format(H,c)) # random walk should possess brownian motion Hurst statistics e.g. H=0.5
-    assert H<0.6 and H>0.4

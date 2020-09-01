@@ -1,0 +1,10 @@
+name: fma
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pip
+  - numpy==1.19.1
+  - matplotlib==3.3.1
+  - pytest==6.0.2
+  - scipy==1.5.2

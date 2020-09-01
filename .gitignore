@@ -1,0 +1,10 @@
+/venv
+**.iml
+/.idea
+.metals
+.vscode
+.DS_Store
+**.pyc
+fractalmarkets.egg-info/
+fma.egg-info/
+examples/stock_rs.py

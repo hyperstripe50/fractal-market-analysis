@@ -96,12 +96,17 @@ if __name__ == '__main__':
     # No random number generator produces true random numbers. The series produced actually has long cycle, or memory, which causes the series to repeat.
     # Ideally, the pseudo-random generator reduces memory by following Peters FMH p.68 wherein the series are scrambled according to two other pseudo-random
     # series. The series should have mean zero and standard deviation of one.
-    series = np.array(random_walk(99999, cumprod=True))
+    # series = np.array(random_walk(99999, cumprod=True))
 
     # OR
 
-    # Load from dataset
+    # Load from SP500 dataset
     # series = np.genfromtxt('datasets/sp500.csv', delimiter=',')
+
+    # OR
+
+    # Load from SP500 dataset
+    series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[:,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
 
     # OR
 

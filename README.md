@@ -19,7 +19,7 @@ source venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
-## Run the program with a random walk
+## Run the program
 ```javascript
 // from fractal-market-analysis directory
 python rescaled-range-analysis/__init__.py

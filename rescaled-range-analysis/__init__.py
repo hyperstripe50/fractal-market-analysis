@@ -10,7 +10,7 @@ def __to_log_returns_series(x):
     :param x: 1D array of numbers
     :return: 1D array of log returns
     """
-    log_returns = np.log(x[:1]/x[:-1])
+    log_returns = np.log(x[1:]/x[:-1])
 
     return log_returns
 
@@ -148,7 +148,9 @@ if __name__ == '__main__':
     # calculate log returns and AR(1) residuals as per Peters FMH p.62
     obv = __get_obv(series)
     series = __to_log_returns_series(series[:obv])
-    series = __get_ar1_residuals(series[:obv-1])
+    print(len(series))
+    series = __get_ar1_residuals(series)
+    print(len(series))
 
     # Evaluate Hurst equation
     H, c, data = __compute_Hc(series)

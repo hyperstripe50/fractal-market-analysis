@@ -18,6 +18,8 @@ python -m virtualenv venv
 ```javascript
 // from fractal-market-analysis directory
 source venv/Scripts/activate
+// it is possible that your venv does has a bin directory rather than a Script directory. If so run the following
+// source venv/bin/activate
 ```
 
 ### Install proper packages

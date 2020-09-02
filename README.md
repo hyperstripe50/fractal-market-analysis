@@ -1,10 +1,17 @@
 # Fractal Market Analysis Code
 
 ## QuickStart
+### Install virtualenv
+```javascript
+pip install virtualenv
+```
+
 ### Create a virtual environment
 ```javascript
 // from fractal-market-analysis directory
 python -m virtualenv venv
+// sometimes that does not work so try below
+// virtualenv venv
 ```
 
 ### Start the virtual environment

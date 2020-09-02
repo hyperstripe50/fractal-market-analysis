@@ -54,7 +54,7 @@ def __get_rs(x):
     rescaled_x = x - mean_x
     Z = np.cumsum(rescaled_x)
     R = max(Z) - min(Z)
-    S = np.std(x, ddof=0)
+    S = np.std(x, ddof=0) # Peters FMH p.62 uses population standard deviation i.e. ddof = 0. Sample standard deviation ddof = 1.
 
     if R == 0 or S == 0:
         return 0
@@ -66,8 +66,7 @@ def __compute_Hc(x):
     :param x: 1D array of numbers
     :return: number representing R/S rescaled range
     """
-     # Peters FMH p.62 uses population standard deviation i.e. ddof = 0. Sample standard deviation ddof = 1.
-    i = 0 # small values of i produce unstable estimates when sample size is small
+    i = 0 
     obv = len(x)
     RS = []
     N  = []
@@ -76,7 +75,7 @@ def __compute_Hc(x):
         n   = math.floor(obv/i)
         num = obv/i
         rs = []
-        if n >= num and n > 9:
+        if n >= num and n > 9: # small values of n produce unstable estimates when sample size is small
             for start in range(0, len(x), n):
                 rs.append(__get_rs(x[start:start + n]))
             RS.append(np.mean(rs))
@@ -113,7 +112,7 @@ def __log_log_plot(x,y,H,c,show=False):
     ax.text(0.2,0.8,"Y = {:.4f}X+{:.4f} \n $R^2$ = {:.3f}".format(H,c,r2),transform=ax.transAxes)
     ax.legend()
 
-    if show: #option to render while running else return the axis object
+    if show: # option to render while running else return the axis object
         plt.show()
 
     return ax
@@ -138,7 +137,7 @@ if __name__ == '__main__':
     # OR
 
     # Load from SP500 dataset
-    series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[:-261,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
+    series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[:,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
 
     # OR
 

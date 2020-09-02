@@ -67,7 +67,7 @@ def __compute_Hc(x):
     :return: number representing R/S rescaled range
     """
      # Peters FMH p.62 uses population standard deviation i.e. ddof = 0. Sample standard deviation ddof = 1.
-    i = 9 # small values of i produce unstable estimates when sample size is small
+    i = 0 # small values of i produce unstable estimates when sample size is small
     obv = len(x)
     RS = []
     N  = []
@@ -76,7 +76,7 @@ def __compute_Hc(x):
         n   = math.floor(obv/i)
         num = obv/i
         rs = []
-        if n >= num:
+        if n >= num and n > 9:
             for start in range(0, len(x), n):
                 rs.append(__get_rs(x[start:start + n]))
             RS.append(np.mean(rs))
@@ -138,7 +138,7 @@ if __name__ == '__main__':
     # OR
 
     # Load from SP500 dataset
-    series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[:,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
+    series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[:-261,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
 
     # OR
 
@@ -147,12 +147,12 @@ if __name__ == '__main__':
     # series = series['Close'].to_numpy()
 
     # calculate log returns and AR(1) residuals as per Peters FMH p.62
-    series = __to_log_returns_series(series)
-    series = __get_ar1_residuals(series)
+    obv = __get_obv(series)
+    series = __to_log_returns_series(series[:obv])
+    series = __get_ar1_residuals(series[:obv-1])
 
     # Evaluate Hurst equation
     H, c, data = __compute_Hc(series)
-
     print("H={:.4f}, c={:.4f}".format(H,c)) # random walk should possess brownian motion Hurst statistics e.g. H=0.5
 
     #Log log plot

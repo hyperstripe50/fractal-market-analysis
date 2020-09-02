@@ -1,7 +1,7 @@
 import numpy as np
 import math
 import quandl
-from hurst import compute_Hc, random_walk
+from hurst import random_walk
 quandl.ApiConfig.api_key="G1MYyTPSFZkRfPM6MWUp" # for pulling data from quandl
 
 def __to_log_returns_series(x):

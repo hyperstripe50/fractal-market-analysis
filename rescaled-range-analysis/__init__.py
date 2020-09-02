@@ -148,13 +148,11 @@ if __name__ == '__main__':
     # calculate log returns and AR(1) residuals as per Peters FMH p.62
     obv = __get_obv(series)
     series = __to_log_returns_series(series[:obv])
-    print(len(series))
     series = __get_ar1_residuals(series)
-    print(len(series))
 
     # Evaluate Hurst equation
     H, c, data = __compute_Hc(series)
     print("H={:.4f}, c={:.4f}".format(H,c)) # random walk should possess brownian motion Hurst statistics e.g. H=0.5
 
     #Log log plot
-    __log_log_plot(data[0],data[1],H,c,show=True)
+    __log_log_plot(data[0],data[1],H,c,show=False)

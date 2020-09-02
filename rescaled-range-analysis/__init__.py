@@ -2,6 +2,7 @@ import numpy as np
 import math
 import quandl
 from hurst import random_walk
+import matplotlib.pyplot as plt; plt.style.use('ggplot')
 quandl.ApiConfig.api_key="G1MYyTPSFZkRfPM6MWUp" # for pulling data from quandl
 
 def __to_log_returns_series(x):
@@ -86,6 +87,37 @@ def __compute_Hc(x):
 
     return H, c, [N, RS]
 
+def __log_log_plot(x,y,H,c,show=False):
+
+    """
+    :param x: 1D array non log scaled
+    :param y: 1D array non log scaled
+    :param H: Hurst exponent
+    :param c: constant c
+    :param show: boolean option to render the plot after the Hurst print out
+    :return: axis object containing log log plot ax.show() will render the plot inline
+    """
+
+    _,ax = plt.subplots(figsize=(10,7))
+    log_x = np.log10(x)
+    log_y = np.log10(y)
+    ax.plot(log_x,log_y,label='real') #plot empirical line
+    
+    lm = [c + n*H for n in log_x] # assume empirical solution for eq 4.8
+    r2 = np.corrcoef(lm,y)[1][0]
+
+    ax.plot(log_x,lm,label='fitted')
+    ax.set_title('(R/S) Log Log Plot')
+    ax.set_xlabel('Log R/S')
+    ax.set_ylabel('Log Size')
+    ax.text(0.2,0.8,"Y = {:.4f}X+{:.4f} \n $R^2$ = {:.3f}".format(H,c,r2),transform=ax.transAxes)
+    ax.legend()
+
+    if show: #option to render while running else return the axis object
+        plt.show()
+
+    return ax
+
 
 if __name__ == '__main__':
 
@@ -122,3 +154,6 @@ if __name__ == '__main__':
     H, c, data = __compute_Hc(series)
 
     print("H={:.4f}, c={:.4f}".format(H,c)) # random walk should possess brownian motion Hurst statistics e.g. H=0.5
+
+    #Log log plot
+    __log_log_plot(data[0],data[1],H,c,show=True)

@@ -10,7 +10,7 @@ def __to_log_returns_series(x):
     :param x: 1D array of numbers
     :return: 1D array of log returns
     """
-    log_returns = np.log(x[1:]/x[:-1]) 
+    log_returns = np.log(x[1:]/x[:-1])
 
     return log_returns
 
@@ -54,7 +54,7 @@ def __get_rs(x):
     rescaled_x = x - mean_x
     Z = np.cumsum(rescaled_x)
     R = max(Z) - min(Z)
-    S = np.std(x, ddof=0)
+    S = np.std(x, ddof=0) # Peters FMH p.62 uses population standard deviation i.e. ddof = 0. Sample standard deviation ddof = 1.
 
     if R == 0 or S == 0:
         return 0
@@ -66,8 +66,7 @@ def __compute_Hc(x):
     :param x: 1D array of numbers
     :return: number representing R/S rescaled range
     """
-     # Peters FMH p.62 uses population standard deviation i.e. ddof = 0. Sample standard deviation ddof = 1.
-    i = 9 # small values of i produce unstable estimates when sample size is small
+    i = 0 
     obv = len(x)
     RS = []
     N  = []
@@ -76,7 +75,7 @@ def __compute_Hc(x):
         n   = math.floor(obv/i)
         num = obv/i
         rs = []
-        if n >= num:
+        if n >= num and n > 9: # small values of n produce unstable estimates when sample size is small
             for start in range(0, len(x), n):
                 rs.append(__get_rs(x[start:start + n]))
             RS.append(np.mean(rs))
@@ -124,7 +123,7 @@ def __log_log_plot(x,y,H,c,show=True):
     ax.text(0.2,0.65,"Y = {:.4f}X+{:.4f} \n $R^2$ = {:.3f}".format(b,a,r22),transform=ax.transAxes)
     ax.legend()
 
-    if show: #option to render while running else return the axis object
+    if show: # option to render while running else return the axis object
         plt.show()
 
     return ax
@@ -158,12 +157,12 @@ if __name__ == '__main__':
     # series = series['Close'].to_numpy()
 
     # calculate log returns and AR(1) residuals as per Peters FMH p.62
-    series = __to_log_returns_series(series)
+    obv = __get_obv(series)
+    series = __to_log_returns_series(series[:obv])
     series = __get_ar1_residuals(series)
 
     # Evaluate Hurst equation
     H, c, data = __compute_Hc(series)
-
     print("H={:.4f}, c={:.4f}".format(H,c)) # random walk should possess brownian motion Hurst statistics e.g. H=0.5
 
     #Log log plot

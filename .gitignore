@@ -1,3 +1,5 @@
 /venv
 **.iml
 /.idea
+.metals
+.vscode

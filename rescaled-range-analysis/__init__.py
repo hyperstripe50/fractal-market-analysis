@@ -110,13 +110,13 @@ def __log_log_plot(x,y,H,c,show=True):
     #closed form solution for univariate OLS
     y_bar=np.mean(log_y)
     x_bar=np.mean(log_x)
-    a=np.cov(log_x,log_y)[0][1]/np.var(log_x) #Covariance / variance
-    b=y_bar-a*x_bar
+    b=np.cov(log_x,log_y)[0][1]/np.var(log_x) #Covariance / variance
+    a=y_bar-b*x_bar
     lm2=[a + n*b for n in log_x]
     r22=np.corrcoef(lm2,log_y)[1][0]
 
     ax.plot(log_x,lm,'b--',label='fitted empirical')
-    ax.plot(log_x,lm2,'g--',label='fitted OLS')
+    ax.plot(log_x,lm2,'g--',label='OLS')
     ax.set_title('(R/S) Log Log Plot')
     ax.set_xlabel('Log Size')
     ax.set_ylabel('Log R/S')

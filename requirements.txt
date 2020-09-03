@@ -1,3 +1,4 @@
 hurst==0.0.5
 numpy==1.19.1
 quandl==3.5.2
+matplotlib==3.3.1

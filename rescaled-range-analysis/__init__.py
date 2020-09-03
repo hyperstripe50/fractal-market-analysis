@@ -2,6 +2,7 @@ import numpy as np
 import math
 import quandl
 from hurst import random_walk
+import matplotlib.pyplot as plt; plt.style.use('ggplot')
 quandl.ApiConfig.api_key="G1MYyTPSFZkRfPM6MWUp" # for pulling data from quandl
 
 def __to_log_returns_series(x):
@@ -9,7 +10,7 @@ def __to_log_returns_series(x):
     :param x: 1D array of numbers
     :return: 1D array of log returns
     """
-    log_returns = np.log(x[:1]/x[:-1])
+    log_returns = np.log(x[1:]/x[:-1])
 
     return log_returns
 
@@ -53,7 +54,7 @@ def __get_rs(x):
     rescaled_x = x - mean_x
     Z = np.cumsum(rescaled_x)
     R = max(Z) - min(Z)
-    S = np.std(x, ddof=0)
+    S = np.std(x, ddof=0) # Peters FMH p.62 uses population standard deviation i.e. ddof = 0. Sample standard deviation ddof = 1.
 
     if R == 0 or S == 0:
         return 0
@@ -65,8 +66,7 @@ def __compute_Hc(x):
     :param x: 1D array of numbers
     :return: number representing R/S rescaled range
     """
-     # Peters FMH p.62 uses population standard deviation i.e. ddof = 0. Sample standard deviation ddof = 1.
-    i = 9 # small values of i produce unstable estimates when sample size is small
+    i = 0 
     obv = len(x)
     RS = []
     N  = []
@@ -75,7 +75,7 @@ def __compute_Hc(x):
         n   = math.floor(obv/i)
         num = obv/i
         rs = []
-        if n >= num:
+        if n >= num and n > 9: # small values of n produce unstable estimates when sample size is small
             for start in range(0, len(x), n):
                 rs.append(__get_rs(x[start:start + n]))
             RS.append(np.mean(rs))
@@ -85,6 +85,48 @@ def __compute_Hc(x):
     H, c = np.linalg.lstsq(A, np.log10(RS), rcond=-1)[0] # slope (Hurst exponent), intercept (constant); WRT Peters FMH p. 56 eq 4.7 (R/S)_n = c*n^H
 
     return H, c, [N, RS]
+
+def __log_log_plot(x,y,H,c,show=True):
+
+    """
+    :param x: 1D array non log scaled
+    :param y: 1D array non log scaled
+    :param H: Hurst exponent
+    :param c: constant c
+    :param show: boolean option to render the plot after the Hurst print out
+    :return: axis object containing log log plot ax.show() will render the plot inline
+    """
+
+    _,ax = plt.subplots(figsize=(10,7))
+    log_x = np.log10(x)
+    log_y = np.log10(y)
+    ax.plot(log_x,log_y,'ro-',label='real') #plot empirical line
+    
+    lm=[c + n*H for n in log_x] # assume empirical solution for eq 4.8
+    r2=np.corrcoef(lm,log_y)[1][0]
+
+    #fit OLS as usual with numpy @TODO decide which linear model to keep numpy implementation or above
+    #closed form solution for univariate OLS
+    y_bar=np.mean(log_y)
+    x_bar=np.mean(log_x)
+    b=np.cov(log_x,log_y)[0][1]/np.var(log_x) #Covariance / variance
+    a=y_bar-b*x_bar
+    lm2=[a + n*b for n in log_x]
+    r22=np.corrcoef(lm2,log_y)[1][0]
+
+    ax.plot(log_x,lm,'b--',label='fitted empirical')
+    ax.plot(log_x,lm2,'g--',label='OLS')
+    ax.set_title('(R/S) Log Log Plot')
+    ax.set_xlabel('Log Size')
+    ax.set_ylabel('Log R/S')
+    ax.text(0.2,0.8,"(fitted) Y = {:.4f}X{}{:.4f} \n $R^2$ = {:.3f}".format(H,"+" if c>0 else "",c,r2),transform=ax.transAxes)
+    ax.text(0.2,0.65,"(OLS) Y = {:.4f}X{}{:.4f} \n $R^2$ = {:.3f}".format(b,"+" if a>0 else "",a,r22),transform=ax.transAxes)
+    ax.legend()
+
+    if show: # option to render while running else return the axis object
+        plt.show()
+
+    return ax
 
 
 if __name__ == '__main__':
@@ -115,10 +157,13 @@ if __name__ == '__main__':
     # series = series['Close'].to_numpy()
 
     # calculate log returns and AR(1) residuals as per Peters FMH p.62
-    series = __to_log_returns_series(series)
+    obv = __get_obv(series)
+    series = __to_log_returns_series(series[:obv])
     series = __get_ar1_residuals(series)
 
     # Evaluate Hurst equation
     H, c, data = __compute_Hc(series)
-
     print("H={:.4f}, c={:.4f}".format(H,c)) # random walk should possess brownian motion Hurst statistics e.g. H=0.5
+
+    #Log log plot
+    __log_log_plot(data[0],data[1],H,c)

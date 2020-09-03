@@ -119,8 +119,8 @@ def __log_log_plot(x,y,H,c,show=True):
     ax.set_title('(R/S) Log Log Plot')
     ax.set_xlabel('Log Size')
     ax.set_ylabel('Log R/S')
-    ax.text(0.2,0.8,"Y = {:.4f}X+{:.4f} \n $R^2$ = {:.3f}".format(H,c,r2),transform=ax.transAxes)
-    ax.text(0.2,0.65,"Y = {:.4f}X+{:.4f} \n $R^2$ = {:.3f}".format(b,a,r22),transform=ax.transAxes)
+    ax.text(0.2,0.8,"(fitted) Y = {:.4f}X{}{:.4f} \n $R^2$ = {:.3f}".format(H,"+" if c>0 else "",c,r2),transform=ax.transAxes)
+    ax.text(0.2,0.65,"(OLS) Y = {:.4f}X{}{:.4f} \n $R^2$ = {:.3f}".format(b,"+" if a>0 else "",a,r22),transform=ax.transAxes)
     ax.legend()
 
     if show: # option to render while running else return the axis object

@@ -28,6 +28,13 @@ source venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
+### Bonus for the anaconda users...
+```javascript
+// from fractal-market-analysis directory
+conda env create -f environment.yml
+conda activate fma
+```
+
 ## Run the program
 ```javascript
 // from fractal-market-analysis directory

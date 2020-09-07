@@ -86,18 +86,20 @@ def __compute_Hc(x):
 
     return H, c, [N, RS]
 
-def __log_log_plot(x,y,H,c,show=True):
+def __log_log_plot(x,y,H,c,show=True,V_stat=True):
 
     """
     :param x: 1D array non log scaled
     :param y: 1D array non log scaled
     :param H: Hurst exponent
     :param c: constant c
-    :param show: boolean option to render the plot after the Hurst print out
+    :param show: bool option to render the plot after the Hurst print out
+    :param V_stat: bool option to add a subplot with the V statistic plotted against the log size
     :return: axis object containing log log plot ax.show() will render the plot inline
     """
 
-    _,ax = plt.subplots(figsize=(10,7))
+    plt.figure(figsize=(10,20))
+    ax = plt.subplot(2,1,1)
     log_x = np.log10(x)
     log_y = np.log10(y)
     ax.plot(log_x,log_y,'ro-',label='real') #plot empirical line
@@ -123,8 +125,21 @@ def __log_log_plot(x,y,H,c,show=True):
     ax.text(0.2,0.65,"(OLS) Y = {:.4f}X{}{:.4f} \n $R^2$ = {:.3f}".format(b,"+" if a>0 else "",a,r22),transform=ax.transAxes)
     ax.legend()
 
+    if V_stat:
+        ax_v=plt.subplot(2,1,2)
+        ax_v.plot(log_x,y/np.sqrt(x),'k-',label='V stat')
+        ax_v.plot(np.log10(50),(H*50+c)/np.sqrt(50),'ko') #plot the point as in the example on page 100
+        ax_v.set_title('V Statistic Plot')
+        ax_v.set_xlabel('Log Size')
+        ax_v.set_ylabel('V Stat')
+        ax_v.legend()
+
     if show: # option to render while running else return the axis object
         plt.show()
+
+    axes = [ax]
+    if ax_v is not None: #need a way to keep track of all the axes objects for our plots
+        axes.append(axes)
 
     return ax
 

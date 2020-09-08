@@ -128,7 +128,7 @@ def __log_log_plot(x,y,H,c,show=True,V_stat=True):
     if V_stat:
         ax_v=plt.subplot(2,1,2)
         ax_v.plot(log_x,y/np.sqrt(x),'k-',label='V stat')
-        ax_v.plot(np.log10(50),(H*50+c)/np.sqrt(50),'ko') #plot the point as in the example on page 100
+        # ax_v.plot(np.log10(50),(H*50+c)/np.sqrt(50),'ko') #plot the point as in the example on page 100
         ax_v.set_title('V Statistic Plot')
         ax_v.set_xlabel('Log Size')
         ax_v.set_ylabel('V Stat')

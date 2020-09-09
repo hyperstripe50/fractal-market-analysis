@@ -158,12 +158,12 @@ if __name__ == '__main__':
     # OR
 
     # Load from SP500 dataset
-    # series = np.genfromtxt('datasets/sp500.csv', delimiter=',')
+    series = np.genfromtxt('datasets/sp500.csv', delimiter=',')
 
     # OR
 
-    # Load from SP500 dataset
-    series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[:,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
+    # Load from Dollar Yen historical exchange rate
+    # series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[:,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
 
     # OR
 

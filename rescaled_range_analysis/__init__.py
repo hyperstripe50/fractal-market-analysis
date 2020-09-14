@@ -116,6 +116,16 @@ def __log_log_plot(x,y,H,c,show=True,V_stat=True):
     log_y = np.log10(y)
     ax.plot(log_x,log_y,'ro-',label='R/S') #plot empirical line
 
+    # annotate breaks
+    for a,b in zip(log_x, log_y):
+        label = "{:.0f}".format(math.pow(10, a))
+
+        plt.annotate(label,
+                     (a,b),
+                     textcoords="offset points",
+                     xytext=(0,10),
+                     ha='center')
+
     ey = [ __compute_ers(n) for n in x]
     log_ey = [ math.log10(n) for n in ey ]
 
@@ -137,6 +147,17 @@ def __log_log_plot(x,y,H,c,show=True,V_stat=True):
         ax_v.set_title('V Statistic Plot')
         ax_v.set_xlabel('Log Size')
         ax_v.set_ylabel('V Stat')
+
+        # annotate breaks
+        for a,b in zip(log_x, y/np.sqrt(x)):
+            label = "{:.0f}".format(math.pow(10, a))
+
+            plt.annotate(label,
+                         (a,b),
+                         textcoords="offset points",
+                         xytext=(0,10),
+                         ha='center')
+
         ax_v.legend()
 
     if show: # option to render while running else return the axis object
@@ -163,21 +184,22 @@ if __name__ == '__main__':
     # OR
 
     # Load from SP500 dataset
-    series = np.genfromtxt('datasets/sp500.csv', delimiter=',')
+    # series = np.genfromtxt('datasets/sp500.csv', delimiter=',')
 
     # OR
 
     # Load from Dollar Yen historical exchange rate
-    # series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[:,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
+    series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[::1,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
 
     # OR
 
     # load from quandl
-    # series = quandl.get("WIKI/FB") # read data from quandl
-    # series = series['Close'].to_numpy()
+    # series = quandl.get("WIKI/AAPL") # read data from quandl
+    # series = series['Close'].to_numpy()[::5]
 
     # calculate log returns and AR(1) residuals as per Peters FMH p.62
     obv = __get_obv(series)
+    print(obv)
     series = __to_log_returns_series(series[:obv])
     series = __get_ar1_residuals(series)
 

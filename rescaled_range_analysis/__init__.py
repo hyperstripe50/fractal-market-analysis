@@ -199,7 +199,6 @@ if __name__ == '__main__':
 
     # calculate log returns and AR(1) residuals as per Peters FMH p.62
     obv = __get_obv(series)
-    print(obv)
     series = __to_log_returns_series(series[:obv])
     series = __get_ar1_residuals(series)
 

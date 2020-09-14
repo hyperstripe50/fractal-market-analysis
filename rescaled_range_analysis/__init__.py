@@ -45,6 +45,15 @@ def __get_ar1_residuals(x):
 
     return ar1_residuals
 
+def __compute_ers(n):
+    """
+    :param n: log(number of observations)
+    :return: E(R/S) as per Peters FMH p. 71 derived correction. Test values on p. 115
+    E(R/S_n) = ((n - 0.5) / n) * ( n * pi/2 )^-0.5 * sum(r=1 -> n-1, sqrt((n-r)/r))
+    """
+
+    return ((n - 0.5) / n) * math.pow(n * (math.pi / 2), -0.5) * np.sum(np.array([ math.sqrt((n-r)/r) for r in range(1, n-1) ]))
+
 def __get_rs(x):
     """
     :param x: 1D array of numbers
@@ -99,36 +108,32 @@ def __log_log_plot(x,y,H,c,show=True,V_stat=True):
     """
 
     plt.figure(figsize=(10,20))
+    plt.subplots_adjust(hspace=0.5)
+
     ax = plt.subplot(2,1,1)
+
     log_x = np.log10(x)
     log_y = np.log10(y)
-    ax.plot(log_x,log_y,'ro-',label='real') #plot empirical line
-    
+    ax.plot(log_x,log_y,'ro-',label='R/S') #plot empirical line
+
+    ey = [ __compute_ers(n) for n in x]
+    log_ey = [ math.log10(n) for n in ey ]
+
     lm=[c + n*H for n in log_x] # assume empirical solution for eq 4.8
     r2=np.corrcoef(lm,log_y)[1][0]
 
-    #fit OLS as usual with numpy @TODO decide which linear model to keep numpy implementation or above
-    #closed form solution for univariate OLS
-    y_bar=np.mean(log_y)
-    x_bar=np.mean(log_x)
-    b=np.cov(log_x,log_y)[0][1]/np.var(log_x) #Covariance / variance
-    a=y_bar-b*x_bar
-    lm2=[a + n*b for n in log_x]
-    r22=np.corrcoef(lm2,log_y)[1][0]
-
-    ax.plot(log_x,lm,'b--',label='fitted empirical')
-    ax.plot(log_x,lm2,'g--',label='OLS')
+    ax.plot(log_x,log_ey,'g--',label='E(R/S)')
+    ax.plot(log_x,lm,'b--',label='Fitted Empirical')
     ax.set_title('(R/S) Log Log Plot')
     ax.set_xlabel('Log Size')
     ax.set_ylabel('Log R/S')
     ax.text(0.2,0.8,"(fitted) Y = {:.4f}X{}{:.4f} \n $R^2$ = {:.3f}".format(H,"+" if c>0 else "",c,r2),transform=ax.transAxes)
-    ax.text(0.2,0.65,"(OLS) Y = {:.4f}X{}{:.4f} \n $R^2$ = {:.3f}".format(b,"+" if a>0 else "",a,r22),transform=ax.transAxes)
     ax.legend()
 
     if V_stat:
         ax_v=plt.subplot(2,1,2)
-        ax_v.plot(log_x,y/np.sqrt(x),'k-',label='V stat')
-        # ax_v.plot(np.log10(50),(H*50+c)/np.sqrt(50),'ko') #plot the point as in the example on page 100
+        ax_v.plot(log_x,y/np.sqrt(x),'k-',label='V Stat')
+        ax_v.plot(log_x,ey/np.sqrt(x), 'g--', label='E(R/S)')
         ax_v.set_title('V Statistic Plot')
         ax_v.set_xlabel('Log Size')
         ax_v.set_ylabel('V Stat')

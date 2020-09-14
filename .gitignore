@@ -3,3 +3,5 @@
 /.idea
 .metals
 .vscode
+.DS_Store
+**.pyc

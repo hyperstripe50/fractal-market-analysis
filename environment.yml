@@ -3,7 +3,9 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - hurst==0.0.5
+  - pip
+  - pip:
+    - hurst==0.0.5 #have to force a pip install as hurst is not supported in conda channels
   - numpy==1.19.1
   - quandl==3.5.2
   - matplotlib==3.3.1

@@ -78,7 +78,7 @@ def __compute_multiplicative_cascade(k_max, M, randomize=False):
     :param randomize: whether or not to shuffle M before assigning mass to child cells. See page 13 of "A Multifractal Model of Asset Returns" 1997
     :return: [x, ...], [y, ...] corresponding to multiplicative cascade y coordinates
     """
-    y = __cascade(1, 1, 1, k_max, [0.6, 0.4], randomize) 
+    y = __cascade(1, 1, 1, k_max, M, randomize) 
     x = np.linspace(0, 1, num=len(y), endpoint=True)
 
     return x, y
@@ -256,7 +256,7 @@ if __name__ == '__main__':
 
     # ---------------------------------------------------------- Multiplicative Binomial Cascade ------------------------------------------------------------
 
-    x, y = __compute_multiplicative_cascade(2, [0.6, 0.4], False)
+    x, y = __compute_multiplicative_cascade(4, [0.6, 0.4], False)
 
     plt.step(x, y, where='mid')
     plt.ylim(bottom=0)

@@ -70,6 +70,50 @@ def __get_rs(x):
 
     return R / S
 
+def __compute_multiplicative_cascade(k_max, M, randomize=False):
+    """
+    Helper function for __cascade
+    :param k_max: max depth of the recursion tree
+    :param M: array m0, m1, ..., mb where sum(M) = 1
+    :param randomize: whether or not to shuffle M before assigning mass to child cells. See page 13 of "A Multifractal Model of Asset Returns" 1997
+    :return: [x, ...], [y, ...] corresponding to multiplicative cascade y coordinates
+    """
+    y = __cascade(1, 1, 1, k_max, [0.6, 0.4], randomize) 
+    x = np.linspace(0, 1, num=len(y), endpoint=True)
+
+    return x, y
+
+def __cascade(x, y, k, k_max, M, randomize=False):
+    """
+    :param x: width of current cell
+    :param y: height of current cell
+    :param k: current branch of the recursion tree
+    :param k_max: max depth of the recursion tree
+    :param M: array m0, m1, ..., mb where sum(M) = 1
+    :param randomize: whether or not to shuffle M before assigning mass to child cells. See page 13 of "A Multifractal Model of Asset Returns" 1997
+    :return: [y, ...] corresponding to multiplicative cascade y coordinates
+    """
+    a = x * y
+    x_next = x / len(M)
+
+    M_shuffle = np.copy(M)
+    if randomize:
+        np.random.shuffle(M_shuffle)
+    else:
+        M_shuffle = M_shuffle
+        
+    y_i = np.array([])
+    if (k == k_max):
+        for m in M_shuffle:
+            y_i = np.append(y_i, (m * a) / x_next)
+
+        return y_i
+
+    for m in M_shuffle:
+        y_i = np.append(y_i, __cascade(x_next, (m * a) / x_next, k + 1, k_max, M, randomize))
+    
+    return y_i
+
 def __compute_Hc(x):
     """
     :param x: 1D array of numbers
@@ -172,6 +216,7 @@ def __log_log_plot(x,y,H,c,show=True,V_stat=True):
 
 if __name__ == '__main__':
 
+    # ---------------------------------------------------------- R/S Analysis ----------------------------------------------------------------------
     # Choose one way to load data
 
     # Use random_walk from existing hurst library.
@@ -189,22 +234,31 @@ if __name__ == '__main__':
     # OR
 
     # Load from Dollar Yen historical exchange rate
-    series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[::1,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
+    # series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[::1,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
 
-    # OR
+    # # # OR
 
-    # load from quandl
-    # series = quandl.get("WIKI/AAPL") # read data from quandl
-    # series = series['Close'].to_numpy()[::5]
+    # # load from quandl
+    # # series = quandl.get("WIKI/AAPL") # read data from quandl
+    # # series = series['Close'].to_numpy()[::5]
 
-    # calculate log returns and AR(1) residuals as per Peters FMH p.62
-    obv = __get_obv(series)
-    series = __to_log_returns_series(series[:obv])
-    series = __get_ar1_residuals(series)
+    # # calculate log returns and AR(1) residuals as per Peters FMH p.62
+    # obv = __get_obv(series)
+    # series = __to_log_returns_series(series[:obv])
+    # series = __get_ar1_residuals(series)
 
-    # Evaluate Hurst equation
-    H, c, data = __compute_Hc(series)
-    print("H={:.4f}, c={:.4f}".format(H,c)) # random walk should possess brownian motion Hurst statistics e.g. H=0.5
+    # # Evaluate Hurst equation
+    # H, c, data = __compute_Hc(series)
+    # print("H={:.4f}, c={:.4f}".format(H,c)) # random walk should possess brownian motion Hurst statistics e.g. H=0.5
 
-    #Log log plot
-    __log_log_plot(data[0],data[1],H,c)
+    # #Log log plot
+    # __log_log_plot(data[0],data[1],H,c)
+
+    # ---------------------------------------------------------- Multiplicative Binomial Cascade ------------------------------------------------------------
+
+    x, y = __compute_multiplicative_cascade(2, [0.6, 0.4], False)
+
+    plt.step(x, y, where='mid')
+    plt.ylim(bottom=0)
+    plt.xlim(0)
+    plt.show()

@@ -79,7 +79,10 @@ def __compute_multiplicative_cascade(k_max, M, randomize=False):
     :return: [x, ...], [y, ...] corresponding to multiplicative cascade y coordinates
     """
     y = __cascade(1, 1, 1, k_max, M, randomize) 
-    x = np.linspace(0, 1, num=len(y), endpoint=True)
+    x = np.linspace(0, 1, num=len(y), endpoint=False)
+    
+    y = np.append(y, y[-1]) # duplicate last to draw proper graph
+    x = np.append(x, 1)     # duplicate last to draw proper graph
 
     return x, y
 
@@ -256,9 +259,9 @@ if __name__ == '__main__':
 
     # ---------------------------------------------------------- Multiplicative Binomial Cascade ------------------------------------------------------------
 
-    x, y = __compute_multiplicative_cascade(4, [0.6, 0.4], False)
-
-    plt.step(x, y, where='mid')
+    x, y = __compute_multiplicative_cascade(2, [0.6, 0.4], False)
+    plt.step(x, y, where='post')
     plt.ylim(bottom=0)
     plt.xlim(0)
+    plt.xticks(x)
     plt.show()

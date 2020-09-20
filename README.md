@@ -28,6 +28,12 @@ source venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
+### Install our application and watch for edits
+```javascript
+// from fractal_market_analysis directory. This will allow us to use fma imports in our modules.
+pip install -e .
+```
+
 ### Bonus for the anaconda users...
 ```javascript
 // from fractal_market_analysis directory
@@ -35,10 +41,10 @@ conda env create -f environment.yml
 conda activate fma
 ```
 
-## Run the program
+## Run an example
 ```javascript
 // from fractal_market_analysis directory
-python rescaled-range-analysis/__init__.py
+python examples/rs_log_log.py // or any other file
 ```
 
 ## Run the Tests

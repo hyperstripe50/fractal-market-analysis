@@ -1,4 +1,4 @@
-from rescaled_range_analysis import __compute_ers
+from fma.rs.metrics import __compute_ers
 from math import log10
 
 def test_ers():

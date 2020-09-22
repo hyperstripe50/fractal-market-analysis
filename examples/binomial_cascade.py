@@ -4,7 +4,6 @@ from fma.mmar.timeseries import __compute_multiplicative_cascade
 import numpy as np 
 
 if __name__ == '__main__':
-
     parser=argparse.ArgumentParser(description='get options for multifractal measure generator')
     parser.add_argument('--iters',dest='iters',type=int,help='number of iterations',default=4)
     parser.add_argument('--alloc',dest='alloc',type=float, nargs='+', help='M-1 allocations of mass',default=[0.6])

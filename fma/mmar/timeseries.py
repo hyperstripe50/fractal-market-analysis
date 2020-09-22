@@ -58,7 +58,7 @@ def __compute_trading_time(k_max, M, randomize=False):
     x, y = __compute_multiplicative_cascade(k_max, M, randomize)
     x2, y2 = __compute_multiplicative_cascade(k_max, M, randomize)
 
-    return np.cumsum(y * 1 / len(y)), np.cumsum(y2 * 1 / len(y2))
+    return np.cumsum(y * (1 / len(y))), np.cumsum(y2 * (1 / len(y2)))
 
 def __compute_fbm(k_max, x=4/9, y=2/3):
     """

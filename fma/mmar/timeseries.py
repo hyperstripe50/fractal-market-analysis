@@ -48,12 +48,25 @@ def __cascade(x, y, k, k_max, M, randomize=False):
     
     return y_i
 
-def __compute_fbm(k_max, x=4/9, y=2/3, randomize=False):
+def __compute_trading_time(k_max, M, randomize=False):
     """
     :param k_max: max depth of the recursion tree
-    :param H: hurst exponent of the fractional brownian motion generator. 0.5 is brownian motion
-    :param randomize: whether or not to shuffle segments of the three segment generator
-    :return: fbm timeseries
+    :param M: array m0, m1, ..., mb where sum(M) = 1
+    :param randomize: whether or not to shuffle M before assigning mass to child cells. See page 13 of "A Multifractal Model of Asset Returns" 1997
+    :return: [x, ...], [y, ...] corresponding to cdf of trading time
+    """
+    x, y = __compute_multiplicative_cascade(k_max, M, randomize)
+    x2, y2 = __compute_multiplicative_cascade(k_max, M, randomize)
+
+    return np.cumsum(y * 1 / len(y)), np.cumsum(y2 * 1 / len(y2))
+
+def __compute_fbm(k_max, x=4/9, y=2/3):
+    """
+    y^(1/H) = x
+    :param k_max: max depth of the recursion tree
+    :param x: x coord of point P in generator. Brownian motion x=4/9 if y=2/3
+    :param y: y coord of point P in generator. Brownian motion x=4/9 if y=2/3
+    :return: x, y of fbm timeseries
     """
     lhs = math.log(y, y)
     rhs = math.log(x,y)
@@ -61,18 +74,27 @@ def __compute_fbm(k_max, x=4/9, y=2/3, randomize=False):
     H = 1/rhs
     print("Creating fbm with H={:.4f}".format(H)) 
 
-    return __construct_fbm_generator(0, 0, 1, 1, 1, k_max, x, y, randomize)
+    fbm = __construct_fbm_generator(0, 0, 1, 1, 1, k_max, x, y)
+    x = fbm[:,0]
+    y = fbm[:,1]
+    x = np.delete(x, np.arange(0, x.size, 4))
+    y = np.delete(y, np.arange(0, y.size, 4))
 
-def __construct_fbm_generator(x1, y1, x2, y2, k, k_max, x, y, randomize=False):
+    x = np.insert(x, 0, 0)
+    y = np.insert(y, 0, 0)
+
+    return x, y 
+
+def __construct_fbm_generator(x1, y1, x2, y2, k, k_max, x, y):
     """
     H = 1/2
-     ________
-2/3 |__     /|  
-    |  /\  / | 1
-    | /| \/__| 1/3 
-    |/_|__|__|      
-     4/9  5/9 
-         1
+        ________
+    2/3 |__     /|  
+        |  /\  / | 1
+        | /| \/__| 1/3 
+        |/_|__|__|      
+        4/9  5/9 
+            1
 
     y^(1/H) + (2y - 1)^(1/H) + y^(1/H) = 1
     y = x^H
@@ -83,8 +105,8 @@ def __construct_fbm_generator(x1, y1, x2, y2, k, k_max, x, y, randomize=False):
     :param y2: right y coord
     :param k: current branch of the recursion tree
     :param k_max: max depth of the recursion tree
-    :param H: hurst exponent of the generator
-    :param randomize: whether or not to shuffle segments of the three segment generator
+    :param x: x coord of point P in generator. Brownian motion x=4/9 if y=2/3
+    :param y: y coord of point P in generator. Brownian motion x=4/9 if y=2/3
     :return: fbm generator
     """
 
@@ -99,9 +121,9 @@ def __construct_fbm_generator(x1, y1, x2, y2, k, k_max, x, y, randomize=False):
     if (k == k_max):
         return [p0, p1, p2, p3]
     
-    fbm = __construct_fbm_generator(p0[0], p0[1], p1[0], p1[1], k+1, k_max, x, y, randomize) 
-    fbm = np.append(fbm, __construct_fbm_generator(p1[0], p1[1], p2[0], p2[1], k+1, k_max, x, y, randomize), axis=0)
-    fbm = np.append(fbm, __construct_fbm_generator(p2[0], p2[1], p3[0], p3[1], k+1, k_max, x, y, randomize), axis=0)
+    fbm = __construct_fbm_generator(p0[0], p0[1], p1[0], p1[1], k+1, k_max, x, y)
+    fbm = np.append(fbm, __construct_fbm_generator(p1[0], p1[1], p2[0], p2[1], k+1, k_max, x, y), axis=0)
+    fbm = np.append(fbm, __construct_fbm_generator(p2[0], p2[1], p3[0], p3[1], k+1, k_max, x, y), axis=0)
 
     return fbm
 

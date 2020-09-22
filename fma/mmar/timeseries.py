@@ -12,7 +12,7 @@ def __compute_multiplicative_cascade(k_max, M, randomize=False):
     y = __cascade(1, 1, 1, k_max, M, randomize) 
     x = np.linspace(0, 1, num=len(y), endpoint=False)
     
-    y = np.append(y, y[-1]) # duplicate last to draw proper graph
+    y = np.insert(y, 0, 0)  # y(0) = 0
     x = np.append(x, 1)     # duplicate last to draw proper graph
 
     return x, y
@@ -47,3 +47,61 @@ def __cascade(x, y, k, k_max, M, randomize=False):
         y_i = np.append(y_i, __cascade(x_next, (m * a) / x_next, k + 1, k_max, M, randomize))
     
     return y_i
+
+def __compute_fbm(k_max, x=4/9, y=2/3, randomize=False):
+    """
+    :param k_max: max depth of the recursion tree
+    :param H: hurst exponent of the fractional brownian motion generator. 0.5 is brownian motion
+    :param randomize: whether or not to shuffle segments of the three segment generator
+    :return: fbm timeseries
+    """
+    lhs = math.log(y, y)
+    rhs = math.log(x,y)
+
+    H = 1/rhs
+    print("Creating fbm with H={:.4f}".format(H)) 
+
+    return __construct_fbm_generator(0, 0, 1, 1, 1, k_max, x, y, randomize)
+
+def __construct_fbm_generator(x1, y1, x2, y2, k, k_max, x, y, randomize=False):
+    """
+    H = 1/2
+     ________
+2/3 |__     /|  
+    |  /\  / | 1
+    | /| \/__| 1/3 
+    |/_|__|__|      
+     4/9  5/9 
+         1
+
+    y^(1/H) + (2y - 1)^(1/H) + y^(1/H) = 1
+    y = x^H
+    
+    :param x1: left x coord
+    :param y1: left y coord
+    :param x2: right x coord
+    :param y2: right y coord
+    :param k: current branch of the recursion tree
+    :param k_max: max depth of the recursion tree
+    :param H: hurst exponent of the generator
+    :param randomize: whether or not to shuffle segments of the three segment generator
+    :return: fbm generator
+    """
+
+    delta_x = x2 - x1
+    delta_y = y2 - y1
+
+    p0 = [x1, y1]
+    p1 = [x1 + delta_x * x, y1 + delta_y * y]
+    p2 = [p1[0] + delta_x * (1 - 2 * x), p1[1] - delta_y * ((2 * y) - 1)]
+    p3 = [x2, y2]
+
+    if (k == k_max):
+        return [p0, p1, p2, p3]
+    
+    fbm = __construct_fbm_generator(p0[0], p0[1], p1[0], p1[1], k+1, k_max, x, y, randomize) 
+    fbm = np.append(fbm, __construct_fbm_generator(p1[0], p1[1], p2[0], p2[1], k+1, k_max, x, y, randomize), axis=0)
+    fbm = np.append(fbm, __construct_fbm_generator(p2[0], p2[1], p3[0], p3[1], k+1, k_max, x, y, randomize), axis=0)
+
+    return fbm
+

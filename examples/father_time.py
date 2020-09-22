@@ -13,9 +13,7 @@ if __name__ == '__main__':
 
     M = np.append(args.alloc, 1 - np.sum(args.alloc))
     x, y = __compute_multiplicative_cascade(args.iters, M, args.randomize)
+    x2, y2 = __compute_multiplicative_cascade(args.iters, M, args.randomize)
 
-    plt.step(x, y, where='pre')
-    plt.ylim(bottom=0)
-    plt.xlim(0)
-
+    plt.plot(np.cumsum(y * 1 / len(y)),np.cumsum(y2 * 1 / len(y2)))
     plt.show()

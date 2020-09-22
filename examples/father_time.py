@@ -1,6 +1,6 @@
 import argparse
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
-from fma.mmar.timeseries import __compute_multiplicative_cascade
+from fma.mmar.timeseries import __compute_trading_time
 import numpy as np 
 
 if __name__ == '__main__':
@@ -12,8 +12,7 @@ if __name__ == '__main__':
     args=parser.parse_args()
 
     M = np.append(args.alloc, 1 - np.sum(args.alloc))
-    x, y = __compute_multiplicative_cascade(args.iters, M, args.randomize)
-    x2, y2 = __compute_multiplicative_cascade(args.iters, M, args.randomize)
-
-    plt.plot(np.cumsum(y * 1 / len(y)),np.cumsum(y2 * 1 / len(y2)))
+    x, y = __compute_trading_time(args.iters, M, args.randomize)
+    
+    plt.plot(x, y)
     plt.show()

@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt; plt.style.use('ggplot')
 import numpy as np 
 
 if __name__ == '__main__':
-    x1, y1 = np.array(__simulate_bmmt(2, M=[.6, .2, .2], randomize=True))
-    print(x1)
+    x1, y1 = np.array(__simulate_bmmt(1, M=[.6, .4], randomize=True))
+
     plt.plot(x1,y1, 'b-')
 
     plt.show()

@@ -74,6 +74,22 @@ def __construct_fbm_generator(x1, y1, x2, y2, k, k_max, x, y, cdf):
     p2 = [p1[0] + delta_x * (1 - 2 * x), p1[1] - delta_y * ((2 * y) - 1)]
     p3 = [x2, y2]
 
+    i1_lower = cdf.find_interval(p0[0]) - 1
+    i1_upper = cdf.find_interval(p1[0]) - 1
+
+    i2_lower = cdf.find_interval(p1[0]) - 1
+    i2_upper = cdf.find_interval(p2[0]) - 1
+
+    dT1 = cdf.diff_at_index(i1_lower, i1_upper)
+    dT2 = cdf.diff_at_index(i2_lower, i2_upper)
+
+    print("dt1 {:.5f}, dt2 {:.5f}".format(dT1, dT2))
+    p1_t = p1[0]
+    p2_t = p2[0]
+
+    p1[0] = p0[0] + dT1
+    p2[0] = p1[0] + dT2
+
     w0 = p1[0] - p0[0]
     h0 = p1[1] - p0[1]
 
@@ -83,40 +99,28 @@ def __construct_fbm_generator(x1, y1, x2, y2, k, k_max, x, y, cdf):
     w2 = p3[0] - p2[0]
     h2 = p3[1] - p2[1]
 
-    if (cdf != None):
-        i1_lower = cdf.find_interval(p0[0])
-        i1_upper = cdf.find_interval(p1[0])
+    segments = [[w0, h0], [w1, h1], [w2, h2]]
+    np.random.shuffle(segments)
 
-        i2_lower = cdf.find_interval(p1[0])
-        i2_upper = cdf.find_interval(p2[0])
-        
-        dT1 = cdf.diff_at_index(i1_lower, i1_upper)
-        dT2 = cdf.diff_at_index(i2_lower, i2_upper)
+    x_0 = p0[0]
+    y_0 = p0[1]
 
-        p1_t = p1[0]
-        p2_t = p2[0]
+    x_1 = x_0 + segments[0][0]
+    y_1 = y_0 + segments[0][1]
 
-        p1[0] = p0[0] + dT1
-        p2[0] = p1[0] + dT2
-        
-        # print("{:.6f} - {:.6f} -> {:.6f} - {:.6f}; i1_l: {:.6f}".format(p1_t, p2_t, p1[0], p2[0], i1_lower)) 
+    x_2 = x_1 + segments[1][0]
+    y_2 = y_1 + segments[1][1]
+
+    x_3 = x_2 + segments[2][0]
+    y_3 = y_2 + segments[2][1]
+
+    p0 = [x_0, y_0]
+    p1 = [x_1, y_1]
+    p2 = [x_2, y_2]
+    p3 = [x_3, y_3]
+    print("{:.6f} - {:.6f} -> {:.6f} - {:.6f}; i1_l: {:.6f}".format(p1_t, p2_t, p1[0], p2[0], i1_lower))
+
     if (k == k_max):
-        # segments = [[w0, h0], [w1, h1], [w2, h2]]
-        # np.random.shuffle(segments)
-
-        # x_0 = p0[0]
-        # y_0 = p0[1]
-
-        # x_1 = x_0 + segments[0][0]
-        # y_1 = y_0 + segments[0][1]
-
-        # x_2 = x_1 + segments[1][0]
-        # y_2 = y_1 + segments[1][1]
-
-        # x_3 = x_2 + segments[2][0]
-        # y_3 = y_2 + segments[2][1]
-        
-        # return [[x_0, y_0], [x_1, y_1], [x_2, y_2], [x_3, y_3]]
         return [p0, p1, p2, p3]
     
     fbm = __construct_fbm_generator(p0[0], p0[1], p1[0], p1[1], k+1, k_max, x, y, cdf)
@@ -144,6 +148,7 @@ def __simulate_bmmt(k_max, M=[0.6, 0.4], x=4/9, y=2/3, randomize=False):
     cdf = TradingTimeCDF(k_max, M, randomize)
     cdf.compute_cdf()
 
+    print("y coords cdf:")
     print(cdf.y)
 
     return __compute_fbm(k_max, x, y, cdf)

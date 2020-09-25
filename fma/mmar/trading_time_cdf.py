@@ -1,5 +1,6 @@
 import numpy as np
 from fma.mmar.multiplicative_cascade import MutiplicativeCascade
+import math
 
 class TradingTimeCDF:
     def __init__(self, k_max, M, randomize=False):
@@ -10,16 +11,19 @@ class TradingTimeCDF:
         self.y = []
     
     def compute_cdf(self):
-        self.x, self.y = self.__compute_trading_time(self.k_max, self.M, self.randomize)        
+        x, y = self.__compute_trading_time(self.k_max, self.M, self.randomize)
+        self.x = np.append(x, 1)
+        self.y = np.append(y, 1)
 
     def find_interval(self, value):
-        k = 1
-        while k < len(self.y) - 1:
-            left, right = self.y[k - 1], self.y[k]
-            if left < value and value <= right:
-                return k
-            
-            k +=1
+        idx = np.searchsorted(self.x, value, side="left")
+
+        if idx > 0 and (math.fabs(value - self.x[idx-1]) < math.fabs(value - self.x[idx])):
+            return idx
+        elif idx == 0:
+            return 1
+        else:
+            return idx
 
     def diff_at_index(self, lower, upper):
         return self.y[upper] - self.y[lower]

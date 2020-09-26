@@ -1,6 +1,6 @@
 import argparse
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
-from fma.mmar.timeseries import __compute_trading_time
+from fma.mmar.trading_time_cdf import TradingTimeCDF
 import numpy as np 
 
 if __name__ == '__main__':
@@ -12,7 +12,8 @@ if __name__ == '__main__':
     args=parser.parse_args()
 
     M = np.append(args.alloc, 1 - np.sum(args.alloc))
-    x, y = __compute_trading_time(args.iters, M, args.randomize)
+    cdf = TradingTimeCDF(args.iters, M, args.randomize)
+    x, y = cdf.compute_cdf()
     
     plt.plot(x, y)
     plt.show()

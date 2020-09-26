@@ -1,35 +1,26 @@
 import numpy as np
 from fma.mmar.multiplicative_cascade import MutiplicativeCascade
-import math
+from scipy import interpolate
 
 class TradingTimeCDF:
     def __init__(self, k_max, M, randomize=False):
         self.k_max = k_max
         self.M = M
         self.randomize = randomize
-        self.x = []
-        self.y = []
+        self.cdf = None
     
     def compute_cdf(self):
         x, y = self.__compute_trading_time(self.k_max, self.M, self.randomize)
-        self.x = np.append(x, 1)
-        self.y = np.append(y, 1)
+        x = np.append(x, 1)
+        y = np.append(y, 1)
 
-    def find_interval(self, value):
-        idx = np.searchsorted(self.x, value, side="left")
+        self.cdf = interpolate.interp1d(x, y)
 
-        if idx > 0 and (math.fabs(value - self.x[idx-1]) < math.fabs(value - self.x[idx])):
-            return idx
-        elif idx == 0:
-            return 1
-        else:
-            return idx
+    def diff_of_two_x(self, lower, upper):
+        return self.sample_cdf(upper) - self.sample_cdf(lower)
 
-    def diff_at_index(self, lower, upper):
-        return self.y[upper] - self.y[lower]
-
-    def sample_cdf_at_index(self, index):
-        return self.y[index]
+    def sample_cdf(self, x):
+        return self.cdf(x)
 
     def get_slope(self, lower, upper):
         return (self.y[upper] - self.y[lower]) / (self.x[upper] - self.x[lower])

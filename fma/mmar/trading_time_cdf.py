@@ -8,13 +8,17 @@ class TradingTimeCDF:
         self.M = M
         self.randomize = randomize
         self.cdf = None
+        self.x = []
+        self.y = []
     
     def compute_cdf(self):
         x, y = self.__compute_trading_time(self.k_max, self.M, self.randomize)
-        x = np.append(x, 1)
-        y = np.append(y, 1)
+        self.x = np.append(x, 1)
+        self.y = np.append(y, 1)
 
-        self.cdf = interpolate.interp1d(x, y)
+        self.cdf = interpolate.interp1d(self.x, self.y)
+
+        return self.x, self.y
 
     def diff_of_two_x(self, lower, upper):
         return self.sample_cdf(upper) - self.sample_cdf(lower)

@@ -5,17 +5,17 @@ class MutiplicativeCascade:
         self.k_max = k_max
         self.M = M
         self.randomize = randomize
+        self.x = []
+        self.y = []
     
     def cascade(self):
-        y = self.__cascade(1, 1, 1, self.k_max, self.M, self.randomize) 
+        y = self._cascade_recursively(1, 1, 1, self.k_max, self.M, self.randomize)
         x = np.linspace(0, 1, num=len(y), endpoint=False)
 
-        y = np.insert(y, 0, 0)
-        x = np.append(x, 1)
+        self.y = np.insert(y, 0, 0)
+        self.x = np.append(x, 1)
 
-        return x, y
-
-    def __cascade(self, x, y, k, k_max, M, randomize=False):
+    def _cascade_recursively(self, x, y, k, k_max, M, randomize=False):
         """
         :param x: width of current cell
         :param y: height of current cell
@@ -42,6 +42,6 @@ class MutiplicativeCascade:
             return y_i
 
         for m in M_shuffle:
-            y_i = np.append(y_i, self.__cascade(x_next, (m * a) / x_next, k + 1, k_max, M, randomize))
+            y_i = np.append(y_i, self._cascade_recursively(x_next, (m * a) / x_next, k + 1, k_max, M, randomize))
         
         return y_i

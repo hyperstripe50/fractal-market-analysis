@@ -1,66 +1,8 @@
 import numpy as np
 import math
+from fma.mmar.trading_time_cdf import TradingTimeCDF
 
-def __compute_multiplicative_cascade(k_max, M, randomize=False):
-    """
-    Helper function for __cascade
-    :param k_max: max depth of the recursion tree
-    :param M: array m0, m1, ..., mb where sum(M) = 1
-    :param randomize: whether or not to shuffle M before assigning mass to child cells. See page 13 of "A Multifractal Model of Asset Returns" 1997
-    :return: [x, ...], [y, ...] corresponding to multiplicative cascade y coordinates
-    """
-    y = __cascade(1, 1, 1, k_max, M, randomize) 
-    x = np.linspace(0, 1, num=len(y), endpoint=False)
-    
-    y = np.insert(y, 0, 0)  # y(0) = 0
-    x = np.append(x, 1)     # duplicate last to draw proper graph
-
-    return x, y
-
-def __cascade(x, y, k, k_max, M, randomize=False):
-    """
-    :param x: width of current cell
-    :param y: height of current cell
-    :param k: current branch of the recursion tree
-    :param k_max: max depth of the recursion tree
-    :param M: array m0, m1, ..., mb where sum(M) = 1
-    :param randomize: whether or not to shuffle M before assigning mass to child cells. See page 13 of "A Multifractal Model of Asset Returns" 1997
-    :return: [y, ...] corresponding to multiplicative cascade y coordinates
-    """
-    a = x * y
-    x_next = x / len(M)
-
-    M_shuffle = np.copy(M)
-    if randomize:
-        np.random.shuffle(M_shuffle)
-    else:
-        M_shuffle = M_shuffle
-        
-    y_i = np.array([])
-    if (k == k_max):
-        for m in M_shuffle:
-            y_i = np.append(y_i, (m * a) / x_next)
-
-        return y_i
-
-    for m in M_shuffle:
-        y_i = np.append(y_i, __cascade(x_next, (m * a) / x_next, k + 1, k_max, M, randomize))
-    
-    return y_i
-
-def __compute_trading_time(k_max, M, randomize=False):
-    """
-    :param k_max: max depth of the recursion tree
-    :param M: array m0, m1, ..., mb where sum(M) = 1
-    :param randomize: whether or not to shuffle M before assigning mass to child cells. See page 13 of "A Multifractal Model of Asset Returns" 1997
-    :return: [x, ...], [y, ...] corresponding to cdf of trading time
-    """
-    x, y = __compute_multiplicative_cascade(k_max, M, randomize)
-    x2, y2 = __compute_multiplicative_cascade(k_max, M, randomize)
-
-    return np.cumsum(y * (1 / len(y))), np.cumsum(y2 * (1 / len(y2)))
-
-def __compute_fbm(k_max, x=4/9, y=2/3):
+def simulate_bm(k_max, x=4/9, y=2/3, randomize=True):
     """
     y^(1/H) = x
     :param k_max: max depth of the recursion tree
@@ -68,13 +10,12 @@ def __compute_fbm(k_max, x=4/9, y=2/3):
     :param y: y coord of point P in generator. Brownian motion x=4/9 if y=2/3
     :return: x, y of fbm timeseries
     """
-    lhs = math.log(y, y)
     rhs = math.log(x,y)
 
     H = 1/rhs
-    print("Creating fbm with H={:.4f}".format(H)) 
+    # print("Creating fbm with H={:.4f}".format(H))
 
-    fbm = __construct_fbm_generator(0, 0, 1, 1, 1, k_max, x, y)
+    fbm = np.array(_simulate_bm_recursively(0, 0, 1, 1, 1, k_max, x, y, randomize=randomize))
     x = fbm[:,0]
     y = fbm[:,1]
     x = np.delete(x, np.arange(0, x.size, 4))
@@ -83,12 +24,40 @@ def __compute_fbm(k_max, x=4/9, y=2/3):
     x = np.insert(x, 0, 0)
     y = np.insert(y, 0, 0)
 
-    return x, y 
+    return x, y
 
-def __construct_fbm_generator(x1, y1, x2, y2, k, k_max, x, y):
+def simulate_bmmt(k_max, M=[0.6, 0.4], x=4/9, y=2/3, randomize=True):
+    """
+    y^(1/H) = x
+    :param k_max: max depth of the recursion tree
+    :param M: array m0, m1, ..., mb where sum(M) = 1
+    :param x: x coord of point P in generator. Brownian motion x=4/9 if y=2/3
+    :param y: y coord of point P in generator. Brownian motion x=4/9 if y=2/3
+    :param randomize: whether or not to shuffle M before assigning mass to child cells. See page 13 of "A Multifractal Model of Asset Returns" 1997
+    :return: x, y of bownian motion in multifractal time timeseries
+    """
+    rhs = math.log(x,y)
+    H = 1/rhs
+    print("Creating fbm with H={:.4f}".format(H))
+
+    trading_time = TradingTimeCDF(k_max, M, randomize)
+    trading_time.create_trading_time_cdf()
+
+    fbm = np.array(_simulate_bm_recursively(0, 0, 1, 1, 1, k_max, x, y, cdf=trading_time.cdf, randomize=randomize))
+
+    x = fbm[:,0]
+    y = fbm[:,1]
+    x = np.delete(x, np.arange(0, x.size, 4))
+    y = np.delete(y, np.arange(0, y.size, 4))
+    x = np.insert(x, 0, 0)
+    y = np.insert(y, 0, 0)
+
+    return x, y
+
+def _simulate_bm_recursively(x1, y1, x2, y2, k, k_max, x, y, cdf=None, randomize=True):
     """
     H = 1/2
-        ________
+         ________
     2/3 |__     /|  
         |  /\  / | 1
         | /| \/__| 1/3 
@@ -99,17 +68,66 @@ def __construct_fbm_generator(x1, y1, x2, y2, k, k_max, x, y):
     y^(1/H) + (2y - 1)^(1/H) + y^(1/H) = 1
     y = x^H
     
-    :param x1: left x coord
-    :param y1: left y coord
-    :param x2: right x coord
-    :param y2: right y coord
+    :param x1: left x coord of initiator
+    :param y1: left y coord of initiator
+    :param x2: right x coord of initiator
+    :param y2: right y coord of initiator
     :param k: current branch of the recursion tree
     :param k_max: max depth of the recursion tree
     :param x: x coord of point P in generator. Brownian motion x=4/9 if y=2/3
     :param y: y coord of point P in generator. Brownian motion x=4/9 if y=2/3
+    :param cdf: cdf of trading time
     :return: fbm generator
     """
+    p0, p1, p2, p3 = _construct_generator_from_initiator(x1, y1, x2, y2, x, y)
 
+    if cdf != None:
+        p0, p1, p2, p3 = _deform_clock_time(p0, p1, p2, p3, cdf)
+
+    if randomize:
+        _randomize_generator_segments(p0, p1, p2, p3)
+
+    if (k == k_max):
+        return [p0, p1, p2, p3]
+
+    fbm = _simulate_bm_recursively(p0[0], p0[1], p1[0], p1[1], k+1, k_max, x, y, cdf, randomize)
+    fbm = np.append(fbm, _simulate_bm_recursively(p1[0], p1[1], p2[0], p2[1], k+1, k_max, x, y, cdf, randomize), axis=0)
+    fbm = np.append(fbm, _simulate_bm_recursively(p2[0], p2[1], p3[0], p3[1], k+1, k_max, x, y, cdf, randomize), axis=0)
+
+    return fbm
+
+def _construct_generator_from_initiator(x1, y1, x2, y2, x, y):
+    """
+          _______ (x2, y2)
+         |      /|
+         |    /  |
+         |  /    |
+         |/_ __ _|
+    (x1, y1)
+
+         Initiator
+            |
+            |
+         Generator
+         ________
+    2/3 |__     /|
+        |  /\  / | 1
+        | /| \/__| 1/3
+        |/_|__|__|
+        4/9  5/9
+            1
+
+    y^(1/H) + (2y - 1)^(1/H) + y^(1/H) = 1
+    y = x^H
+
+    :param x1: left x coord of initiator
+    :param y1: left y coord of initiator
+    :param x2: right x coord of initiator
+    :param y2: right y coord of initiator
+    :param x: x coord of point P in generator. Brownian motion x=4/9 if y=2/3
+    :param y: y coord of point P in generator. Brownian motion x=4/9 if y=2/3
+    :return: three segment symmetric generator
+    """
     delta_x = x2 - x1
     delta_y = y2 - y1
 
@@ -118,12 +136,87 @@ def __construct_fbm_generator(x1, y1, x2, y2, k, k_max, x, y):
     p2 = [p1[0] + delta_x * (1 - 2 * x), p1[1] - delta_y * ((2 * y) - 1)]
     p3 = [x2, y2]
 
-    if (k == k_max):
-        return [p0, p1, p2, p3]
-    
-    fbm = __construct_fbm_generator(p0[0], p0[1], p1[0], p1[1], k+1, k_max, x, y)
-    fbm = np.append(fbm, __construct_fbm_generator(p1[0], p1[1], p2[0], p2[1], k+1, k_max, x, y), axis=0)
-    fbm = np.append(fbm, __construct_fbm_generator(p2[0], p2[1], p3[0], p3[1], k+1, k_max, x, y), axis=0)
+    return p0, p1, p2, p3
 
-    return fbm
 
+def _deform_clock_time(p0, p1, p2, p3, cdf):
+    """
+    Deforms clock time into trading time as defined by the CDF of a multiplicative cascade. See chapter 11 of Misbehavior of Markets.
+    :param p0:  point 0 of generator
+    :param p1:  point 1 of generator
+    :param p2:  point 2 of generator
+    :param p3:  point 3 of generator
+    :param cdf: Trading Time CDF interp1d function
+    :return:
+    """
+    x1 = p0[0]
+    x2 = p3[0]
+
+    dT1 = cdf(p1[0]) - cdf(p0[0])
+    dT2 = cdf(p2[0]) - cdf(p1[0])
+    dT3 = cdf(p3[0]) - cdf(p2[0])
+    p1[0] = p0[0] + (x2 - x1) * (dT1 / (dT1 + dT2 + dT3))
+    p2[0] = p1[0] + (x2 - x1) * (dT2 / (dT1 + dT2 + dT3))
+    p3[0] = p2[0] + (x2 - x1) * (dT3 / (dT1 + dT2 + dT3))
+
+    return p0, p1, p2, p3
+
+def _randomize_generator_segments(p0, p1, p2, p3):
+    """
+        ________p3
+        |  p1   /|
+        |  /\  / | 1
+        | /  \/  |
+        |/_ _p2__|
+       p0    1
+
+      Not Randomized
+            |
+            |
+        Randomized
+
+              /\
+         ____/__\
+        |   /    |
+        |  /     | 1
+        | /      |
+        |/_ __ __|
+            1
+
+    Randomizes the segments of a generator without rotation.
+    :param p0: left-most coordinates of the generator
+    :param p1: coordinates of the first break of the generator
+    :param p2: coordinates of the second break of the generator
+    :param p3: coordinates of the right-most point of the generator
+    :return: reordered generator without rotation.
+    """
+    w0 = p1[0] - p0[0]
+    h0 = p1[1] - p0[1]
+
+    w1 = p2[0] - p1[0]
+    h1 = p2[1] - p1[1]
+
+    w2 = p3[0] - p2[0]
+    h2 = p3[1] - p2[1]
+
+    segments = [[w0, h0], [w1, h1], [w2, h2]]
+    np.random.shuffle(segments)
+
+    x_0 = p0[0]
+    y_0 = p0[1]
+
+    x_1 = x_0 + segments[0][0]
+    y_1 = y_0 + segments[0][1]
+
+    x_2 = x_1 + segments[1][0]
+    y_2 = y_1 + segments[1][1]
+
+    x_3 = x_2 + segments[2][0]
+    y_3 = y_2 + segments[2][1]
+
+    p0 = [x_0, y_0]
+    p1 = [x_1, y_1]
+    p2 = [x_2, y_2]
+    p3 = [x_3, y_3]
+
+    return p0, p1, p2, p3

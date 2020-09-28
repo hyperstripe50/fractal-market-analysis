@@ -1,7 +1,7 @@
 import argparse
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
-from fma.mmar.timeseries import __compute_multiplicative_cascade
-import numpy as np 
+import numpy as np
+from fma.mmar.multiplicative_cascade import MutiplicativeCascade
 
 if __name__ == '__main__':
     parser=argparse.ArgumentParser(description='get options for multifractal measure generator')
@@ -11,7 +11,11 @@ if __name__ == '__main__':
     args=parser.parse_args()
 
     M = np.append(args.alloc, 1 - np.sum(args.alloc))
-    x, y = __compute_multiplicative_cascade(args.iters, M, args.randomize)
+
+    c = MutiplicativeCascade(args.iters, M, args.randomize)
+    c.cascade()
+
+    x, y = c.x, c.y
 
     plt.step(x, y, where='pre')
     plt.ylim(bottom=0)

@@ -141,7 +141,7 @@ def _construct_generator_from_initiator(x1, y1, x2, y2, x, y):
 
 def _deform_clock_time(p0, p1, p2, p3, cdf):
     """
-    Deforms clock time into trading time as defined by the CDF of a multiplicative cascade.
+    Deforms clock time into trading time as defined by the CDF of a multiplicative cascade. See chapter 11 of Misbehavior of Markets.
     :param p0:  point 0 of generator
     :param p1:  point 1 of generator
     :param p2:  point 2 of generator

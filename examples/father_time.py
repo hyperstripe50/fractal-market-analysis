@@ -13,7 +13,8 @@ if __name__ == '__main__':
 
     M = np.append(args.alloc, 1 - np.sum(args.alloc))
     cdf = TradingTimeCDF(args.iters, M, args.randomize)
-    x, y = cdf.compute_cdf()
+    cdf.create_trading_time_cdf()
+
     
-    plt.plot(x, y)
+    plt.plot(cdf.x, cdf.y)
     plt.show()

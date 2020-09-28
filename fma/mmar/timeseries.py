@@ -77,7 +77,7 @@ def _simulate_bm_recursively(x1, y1, x2, y2, k, k_max, x, y, cdf=None, randomize
     :param x: x coord of point P in generator. Brownian motion x=4/9 if y=2/3
     :param y: y coord of point P in generator. Brownian motion x=4/9 if y=2/3
     :param cdf: cdf of trading time
-    :return: fbm generator
+    :return: simulated time series for fractional brownian motion
     """
     p0, p1, p2, p3 = _construct_generator_from_initiator(x1, y1, x2, y2, x, y)
 
@@ -147,7 +147,7 @@ def _deform_clock_time(p0, p1, p2, p3, cdf):
     :param p2:  point 2 of generator
     :param p3:  point 3 of generator
     :param cdf: Trading Time CDF interp1d function
-    :return:
+    :return: new x,y coordinates of all points after deforming time
     """
     x1 = p0[0]
     x2 = p3[0]

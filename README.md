@@ -1,11 +1,12 @@
 # fma
+## Motivation
+We are hard pressed to find a concrete implementation of both Beniot Mandelbrot's "A Multifractal Model of Asset Returns" and Edgar E. Peters' "Fractal Market Analysis" so, with apologies to the Authors, we attempt to fill this vacancy.
+
 ## Installation
 TODO: make the ```fma``` package available on pypi so that it can be installed by 
 ```
 pip install fma
 ```
-## Motivation
-We are hard pressed to find a concrete implementation of both Beniot Mandelbrot's "A Multifractal Model of Asset Returns" and Edgar E. Peters' "Fractal Market Analysis" so, with apologies to the Authors, we attempt to fill this vacancy.
 
 ## Features
 This package offers time series simulation processes as well as rescaled range analysis.

@@ -2,11 +2,16 @@ import matplotlib.pyplot as plt; plt.style.use('ggplot')
 from fma.rs.metrics import __get_obv, __to_log_returns_series, __get_ar1_residuals, __compute_Hc
 from fma.rs.plots import __log_log_plot
 import numpy as np
+from fma.mmar.timeseries import simulate_bmmt
+import math
 
 if __name__ == '__main__':
     # Load from Dollar Yen historical exchange rate
-    series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[::1,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
+    # series = np.genfromtxt('datasets/dollar-yen-exchange-rate-historical-chart.csv', delimiter=',')[::1,1] # this dataset is the best I can find to verify with Peters FMH. Expected values: H=0.642, c=-0.187
 
+    x, series = simulate_bmmt(7, M=[0.5, 0.5], randomize=True)
+    series = series[3::3]
+    series = np.array([ math.pow(10, y) for y in series ])
     # calculate log returns and AR(1) residuals as per Peters FMH p.62
     obv = __get_obv(series)
     series = __to_log_returns_series(series[:obv])

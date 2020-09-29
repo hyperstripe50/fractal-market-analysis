@@ -1,8 +1,8 @@
-from fma.mmar.timeseries import simulate_bmmt
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 import numpy as np 
 import math
 import argparse
+from fma.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
 
 if __name__ == '__main__':
     parser=argparse.ArgumentParser(description='get options for bmmt generator')
@@ -17,11 +17,11 @@ if __name__ == '__main__':
 
     M = np.append(args.alloc, 1 - np.sum(args.alloc))
 
-    x1, y1 = np.array(simulate_bmmt(args.iters, M=M, x=args.px, y=args.py, randomize=args.randomize))
+    bmmt = BrownianMotionMultifractalTime(args.iters, x=args.px, y=args.py, randomize=args.randomize, M=M)
+    x1, y1 = bmmt.simulate()
 
     if (args.nonlog):
         y1 = [ math.pow(10, y) for y in y1 ]
-
 
     plt.plot(x1,y1, 'b-')
 

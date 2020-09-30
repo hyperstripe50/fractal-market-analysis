@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt; plt.style.use('ggplot')
 import numpy as np 
 import math
 import argparse
+from scipy import interpolate
+
 from fma.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
 
 if __name__ == '__main__':
@@ -23,13 +25,28 @@ if __name__ == '__main__':
     if (args.nonlog):
         y1 = [ math.pow(10, y) for y in y1 ]
 
-    plt.plot(x1,y1, 'b-')
+    f = interpolate.interp1d(x1, y1)
+
+    y1 = [f(x) for x in np.arange(0, 1, .00001)]
+    x1 = np.linspace(0, 1, len(y1), endpoint=True)
+
+    y2 = [b - a for a, b in zip(y1[:-1], y1[1:])]
+
+    fig, axs = plt.subplots(2)
+    fig.suptitle('MMAR')
+
+    axs[0].plot(x1, y1, 'b-')
+    axs[1].plot(x1[:-1], y2)
 
     z1 = np.array(y1)
     z2 = np.array([0] * len(y1))
 
-    plt.fill_between(x1, y1, 0,
+    axs[0].fill_between(x1, y1, 0,
                  where=(z1 >= z2),
                  alpha=0.30, color='green', interpolate=True)
+    
+    axs[0].fill_between(x1, y1, 0,
+                 where=(z1 < z2),
+                 alpha=0.30, color='red', interpolate=True)
 
     plt.show()

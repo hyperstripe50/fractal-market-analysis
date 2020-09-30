@@ -62,7 +62,7 @@ class BrownianMotion:
             p0, p1, p2, p3 = self._deform_clock_time(p0, p1, p2, p3, cdf)
 
         if randomize:
-            self._randomize_generator_segments(p0, p1, p2, p3)
+            p0, p1, p2, p3 = self._randomize_generator_segments(p0, p1, p2, p3)
 
         if (k == k_max):
             return [p0, p1, p2, p3]

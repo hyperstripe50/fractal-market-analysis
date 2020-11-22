@@ -5,15 +5,16 @@ class MutiplicativeCascade:
         self.k_max = k_max
         self.M = M
         self.randomize = randomize
-        self.x = []
-        self.y = []
+        self.data = []
     
     def cascade(self):
         y = self._cascade_recursively(1, 1, 1, self.k_max, self.M, self.randomize)
         x = np.linspace(0, 1, num=len(y), endpoint=False)
 
-        self.y = np.insert(y, 0, 0)
-        self.x = np.append(x, 1)
+        y = np.insert(y, 0, 0)
+        x = np.append(x, 1)
+
+        self.data = np.stack([x, y], axis=1)
 
     def _cascade_recursively(self, x, y, k, k_max, M, randomize=False):
         """

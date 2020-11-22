@@ -1,14 +1,20 @@
 import numpy as np
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 from fma.mmar.brownian_motion import BrownianMotion
+import argparse
 
 if __name__ == '__main__':
-    bm1 = BrownianMotion(12, .457, .603, randomize=False)
-    bm2 = BrownianMotion(12, .457, .603, randomize=False)
-    x1, y1 = bm1.simulate()
-    x2, y2 = bm2.simulate()
+    parser=argparse.ArgumentParser(description='get options for bmmt generator')
+    parser.add_argument('--iters',dest='iters',type=int,help='number of iterations',default=9)
+    parser.add_argument('--randomize_segments',dest='randomize_segments',type=bool,nargs='?',help='Randomize segments',const=True)
+    parser.add_argument('--px',dest='px',type=float,help='x coord of first break point in generator. (0, 1/2)',default=4/9)
+    parser.add_argument('--py',dest='py',type=float,help='y coord of first break point in generator. (0, 1)',default=2/3)
 
-    plt.plot(x1,y1, 'b-')
-    plt.plot(x2,y2, 'g-')
+    args=parser.parse_args()
+
+    bm1 = BrownianMotion(args.iters, args.px, args.py, randomize_segments=args.randomize_segments)
+    data = bm1.simulate()
+
+    plt.plot(data[:,0], data[:,1], 'b-')
 
     plt.show()

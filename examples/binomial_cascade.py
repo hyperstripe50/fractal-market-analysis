@@ -15,9 +15,7 @@ if __name__ == '__main__':
     c = MutiplicativeCascade(args.iters, M, args.randomize)
     c.cascade()
 
-    x, y = c.x, c.y
-
-    plt.step(x, y, where='pre')
+    plt.step(c[:,0], c[:,1] where='pre')
     plt.ylim(bottom=0)
     plt.xlim(0)
 

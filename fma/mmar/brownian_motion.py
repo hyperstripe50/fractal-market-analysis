@@ -1,8 +1,10 @@
 import numpy as np
+from scipy.optimize import fsolve
+import math
 
 class BrownianMotion:
 
-    def __init__(self, k_max, x, y, randomize=False):
+    def __init__(self, k_max, x, y, randomize_segments=False):
         """
         y^(1/H) = x
         :param k_max: max depth of the recursion tree
@@ -13,14 +15,14 @@ class BrownianMotion:
         self.k_max = k_max
         self.x = x
         self.y = y
-        self.randomize = randomize
+        self.randomize_segments = randomize_segments
 
     def simulate(self):
         """
         :return: x, y of fbm timeseries
         """
 
-        fbm = np.array(self._simulate_bm_recursively(0, 0, 1, 1, 1, self.k_max, self.x, self.y, randomize=self.randomize))
+        fbm = np.array(self._simulate_bm_recursively(0, 0, 1, 1, 1, self.k_max, self.x, self.y, self.randomize_segments))
         x = fbm[:,0]
         y = fbm[:,1]
         x = np.delete(x, np.arange(0, x.size, 4))
@@ -29,9 +31,9 @@ class BrownianMotion:
         x = np.insert(x, 0, 0)
         y = np.insert(y, 0, 0)
 
-        return x, y
+        return np.stack([x, y], axis=1)
 
-    def _simulate_bm_recursively(self, x1, y1, x2, y2, k, k_max, x, y, cdf=None, randomize=True):
+    def _simulate_bm_recursively(self, x1, y1, x2, y2, k, k_max, x, y, randomize_segments, cdf=None):
         """
         H = 1/2
              ________
@@ -61,15 +63,15 @@ class BrownianMotion:
         if cdf != None:
             p0, p1, p2, p3 = self._deform_clock_time(p0, p1, p2, p3, cdf)
 
-        if randomize:
+        if randomize_segments:
             p0, p1, p2, p3 = self._randomize_generator_segments(p0, p1, p2, p3)
 
         if (k == k_max):
             return [p0, p1, p2, p3]
 
-        fbm = self._simulate_bm_recursively(p0[0], p0[1], p1[0], p1[1], k+1, k_max, x, y, cdf, randomize)
-        fbm = np.append(fbm, self._simulate_bm_recursively(p1[0], p1[1], p2[0], p2[1], k+1, k_max, x, y, cdf, randomize), axis=0)
-        fbm = np.append(fbm, self._simulate_bm_recursively(p2[0], p2[1], p3[0], p3[1], k+1, k_max, x, y, cdf, randomize), axis=0)
+        fbm = self._simulate_bm_recursively(p0[0], p0[1], p1[0], p1[1], k+1, k_max, x, y, randomize_segments, cdf)
+        fbm = np.append(fbm, self._simulate_bm_recursively(p1[0], p1[1], p2[0], p2[1], k+1, k_max, x, y, randomize_segments, cdf), axis=0)
+        fbm = np.append(fbm, self._simulate_bm_recursively(p2[0], p2[1], p3[0], p3[1], k+1, k_max, x, y, randomize_segments, cdf), axis=0)
 
         return fbm
 
@@ -128,12 +130,24 @@ class BrownianMotion:
         x1 = p0[0]
         x2 = p3[0]
 
-        dT1 = cdf(p1[0]) - cdf(p0[0])
-        dT2 = cdf(p2[0]) - cdf(p1[0])
-        dT3 = cdf(p3[0]) - cdf(p2[0])
-        p1[0] = p0[0] + (x2 - x1) * (dT1 / (dT1 + dT2 + dT3))
-        p2[0] = p1[0] + (x2 - x1) * (dT2 / (dT1 + dT2 + dT3))
-        p3[0] = p2[0] + (x2 - x1) * (dT3 / (dT1 + dT2 + dT3))
+        dT1 = cdf(self.get_within_range(p1[0])) - cdf(self.get_within_range(p0[0]))
+        dT2 = cdf(self.get_within_range(p2[0])) - cdf(self.get_within_range(p1[0]))
+        dT3 = cdf(self.get_within_range(p3[0])) - cdf(self.get_within_range(p2[0]))
+        
+        dT1 = math.fabs(dT1)
+        dT2 = math.fabs(dT2)
+        dT3 = math.fabs(dT3)
+
+        D = self.solve(dT1, dT2, dT3, x2 - x1)[0]
+
+        dt1 = math.pow(dT1, D)
+        dt2 = math.pow(dT2, D)
+        dt3 = math.pow(dT3, D)
+
+        m = (x2 - x1) / (dt1 + dt2 + dt3)
+
+        p1[0] = p0[0] + m*dt1
+        p2[0] = p1[0] + m*dt2
 
         return p0, p1, p2, p3
 
@@ -196,3 +210,20 @@ class BrownianMotion:
         p3 = [x_3, y_3]
 
         return p0, p1, p2, p3
+    
+    def get_within_range(self, num):
+        if num > 1:
+            return 1
+        elif num < 0:
+            return 0
+        else:
+            return num
+
+    def solve(self,x,y,z,w):
+        def f(a):
+            out=x**a+y**a+z**a-w
+            return out
+        
+        solution = fsolve(f,w,xtol=1e-10)
+        
+        return solution

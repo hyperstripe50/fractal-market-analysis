@@ -15,5 +15,5 @@ if __name__ == '__main__':
     cdf = TradingTimeCDF(args.iters, M, args.randomize)
     cdf.create_trading_time_cdf()
     
-    plt.plot(cdf.cascade[:,0], cdf.cascade[:,1])
+    plt.plot(cdf.data[:,0], cdf.data[:,1])
     plt.show()

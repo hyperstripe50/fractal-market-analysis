@@ -17,6 +17,9 @@ class BrownianMotion:
         self.y = y
         self.randomize_segments = randomize_segments
 
+    def get_H(self):
+        return 1/math.log(self.x,self.y)
+        
     def simulate(self):
         """
         :return: x, y of fbm timeseries

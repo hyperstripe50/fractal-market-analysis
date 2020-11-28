@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-def __to_log_returns_series(x):
+def to_log_returns_series(x):
     """
     :param x: 1D array of numbers
     :return: 1D array of log returns
@@ -10,7 +10,7 @@ def __to_log_returns_series(x):
 
     return log_returns
 
-def __get_obv(x):
+def get_obv(x):
     """
     :param x: 1D array
     :return: number of observations to the lower 100 + 2. Since AR(1) residual is passed on to R/S, we lose two points along the way.
@@ -20,7 +20,7 @@ def __get_obv(x):
 
     return obv
 
-def __get_ar1_residuals(x):
+def get_ar1_residuals(x):
     """
     :param x: 1D array of numbers
     :return: 1D array of AR(1) residuals
@@ -41,7 +41,7 @@ def __get_ar1_residuals(x):
 
     return ar1_residuals
 
-def __compute_ers(n):
+def compute_ers(n):
     """
     :param n: log(number of observations)
     :return: E(R/S) as per Peters FMH p. 71 derived correction. Test values on p. 115
@@ -50,7 +50,7 @@ def __compute_ers(n):
 
     return ((n - 0.5) / n) * math.pow(n * (math.pi / 2), -0.5) * np.sum(np.array([ math.sqrt((n-r)/r) for r in range(1, n-1) ]))
 
-def __get_rs(x):
+def get_rs(x):
     """
     :param x: 1D array of numbers
     :return: return R/S for given array
@@ -66,7 +66,7 @@ def __get_rs(x):
 
     return R / S
 
-def __compute_Hc(x):
+def compute_Hc(x):
     """
     :param x: 1D array of numbers
     :return: number representing R/S rescaled range
@@ -82,7 +82,7 @@ def __compute_Hc(x):
         rs = []
         if n >= num and n > 9: # small values of n produce unstable estimates when sample size is small
             for start in range(0, len(x), n):
-                rs.append(__get_rs(x[start:start + n]))
+                rs.append(get_rs(x[start:start + n]))
             RS.append(np.mean(rs))
             N.append(n)
 

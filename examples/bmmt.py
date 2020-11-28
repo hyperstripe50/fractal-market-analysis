@@ -4,6 +4,7 @@ import math
 import argparse
 from scipy import interpolate
 from fma.mmar.brownian_motion import BrownianMotion
+import pandas as pd 
 
 from fma.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
 
@@ -30,7 +31,7 @@ if __name__ == '__main__':
 
     f = interpolate.interp1d(data[:,0], y1)
 
-    y1 = [f(x) for x in np.arange(0, 1, .00001)]
+    y1 = [f(x) for x in np.arange(0, 1, .001)]
     x1 = np.linspace(0, 1, len(y1), endpoint=True)
 
     y2 = [b - a for a, b in zip(y1[:-1], y1[1:])]

@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 import numpy as np
 import math
-from fma.rs.metrics import __compute_ers
+from fma.rs.metrics import compute_ers
 
-def __log_log_plot(x,y,H,c,show=True,V_stat=True):
+def log_log_plot(x,y,H,c,show=True,V_stat=True):
 
     """
     :param x: 1D array non log scaled
@@ -34,7 +34,7 @@ def __log_log_plot(x,y,H,c,show=True,V_stat=True):
                      xytext=(0,10),
                      ha='center')
 
-    ey = [ __compute_ers(n) for n in x]
+    ey = [ compute_ers(n) for n in x]
     log_ey = [ math.log10(n) for n in ey ]
 
     lm=[c + n*H for n in log_x] # assume empirical solution for eq 4.8

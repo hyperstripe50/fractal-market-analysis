@@ -20,28 +20,46 @@ The rescaled range analysis is implemented as per Edgar E. Peters "Fractal Marke
   * mmar
     * BrownianMotion
     * BrownianMotionMultifractalTime
-  * rs // TODO refactor into analysis classes?
-    * metrics
-    * plots
+  * rs
+    * RS
     
 ## Usage
 To simulate timeseries with ```fma```, instantiate the simulation process that you want with the required parameters and run ```simulate```.
 
 ### Brownian Motion in Multifractal Time
-```
+```python
 from fma.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
 
-bmmt = BrownianMotionMultifractalTime(9, x=0.457, y=0.603, randomize=True, M=[0.6, 0.4])
-x, y = bmmt.simulate()
+bmmt = BrownianMotionMultifractalTime(9, x=0.457, y=0.603, randomize_segments=True, randomize_time=True, M=[0.6, 0.4])
+data = bmmt.simulate() # [ [x, y], ..., [x_n, y_n]]
 ```
 
 ### Brownian Motion
-```
+```python
 from fma.mmar.brownian_motion import BrownianMotion
 
-bm =  BrownianMotion(12, .457, .603, randomize=False)
-x, y = bm.simulate()
+bm =  BrownianMotion(12, .457, .603, randomize_segments=True)
+data = bm.simulate() # [ [x, y], ..., [x_n, y_n]]
 ```
+
+### RS Analysis
+```python
+from fma.rs.rs import RS
+
+bmmt = BrownianMotionMultifractalTime(9, x=4/9, y=0.603, randomize_segments=False, randomize_time=False, M=[0.6, 0.4])
+data = bmmt.simulate()
+print("Expected H {}".format(bmmt.get_H()))
+
+rs = RS(data[1:,1]) # timeseries starts at zero which must be omitted to avoid division error
+(H, c, data) = rs.get_H()
+
+rs.plot_vstat() # plot vstat and RS
+```
+```
+>> Expected H 0.6237751068336207
+>> H=0.6465, c=-0.0362
+```
+![R/S Annalysis](https://github.com/hyperstripe50/fractal-market-analysis/blob/master/examples/RSA.png)
 
 ## Developer Guide
 ### Install virtualenv

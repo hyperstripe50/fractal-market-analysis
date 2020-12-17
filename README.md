@@ -163,7 +163,7 @@ conda activate fractalmarkets
 ### Run an example
 ```javascript
 // from fractal_market_analysis directory
-python examples/rs_log_log.py // or any other file
+python examples/rs_analysis.py // or any other file
 ```
 
 ### Run the Tests

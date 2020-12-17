@@ -66,7 +66,7 @@ def get_rs(x):
 
     return R / S
 
-def compute_Hc(x):
+def get_rs_data(x):
     """
     :param x: 1D array of numbers
     :return: number representing R/S rescaled range
@@ -86,7 +86,12 @@ def compute_Hc(x):
             RS.append(np.mean(rs))
             N.append(n)
 
+    return [np.array(N).astype(int), np.array(RS)]
+
+def get_Hc(rs_data, max_n=-1):
+    N = rs_data[0] if max_n == -1 else rs_data[0][np.where(rs_data[0] <= max_n)]
+    RS = rs_data[1][:len(N)]
     A = np.vstack([np.log10(N), np.ones(len(N))]).T # y = Ap, where A = [[x 1]] and p = [[m], [c]]
     H, c = np.linalg.lstsq(A, np.log10(RS), rcond=-1)[0] # slope (Hurst exponent), intercept (constant); WRT Peters FMH p. 56 eq 4.7 (R/S)_n = c*n^H
 
-    return H, c, [N, RS]
+    return H, c

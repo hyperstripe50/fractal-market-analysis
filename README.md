@@ -20,15 +20,14 @@ The rescaled range analysis is implemented as per Edgar E. Peters "Fractal Marke
   * mmar
     * BrownianMotion
     * BrownianMotionMultifractalTime
-  * rs // TODO refactor into analysis classes?
-    * metrics
-    * plots
+  * rs
+    * RS
     
 ## Usage
 To simulate timeseries with ```fma```, instantiate the simulation process that you want with the required parameters and run ```simulate```.
 
 ### Brownian Motion in Multifractal Time
-```
+```python
 from fma.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 from scipy import interpolate
@@ -65,7 +64,7 @@ plt.show()
 ```
 
 ### Brownian Motion
-```
+```python
 from fma.mmar.brownian_motion import BrownianMotion
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 from scipy import interpolate
@@ -81,6 +80,7 @@ x = np.linspace(0, 1, len(y), endpoint=True)
 
 y_diff = [b - a for a, b in zip(y[:-1], y[1:])]
 
+<<<<<<< HEAD
 fig, axs = plt.subplots(2)
 fig.suptitle('MMAR')
 

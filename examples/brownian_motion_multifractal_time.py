@@ -1,4 +1,4 @@
-from fma.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
+from fractalmarkets.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 from scipy import interpolate
 import numpy as np

@@ -1,4 +1,4 @@
-from fma.mmar.brownian_motion import BrownianMotion
+from fractalmarkets.mmar.brownian_motion import BrownianMotion
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 from scipy import interpolate
 import numpy as np

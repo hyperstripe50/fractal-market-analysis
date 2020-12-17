@@ -1,5 +1,5 @@
-from fma.rs.rs import RS
-from fma.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
+from fractalmarkets.rs.rs import RS
+from fractalmarkets.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
 
 bmmt = BrownianMotionMultifractalTime(9, x=4/9, y=0.603, randomize_segments=False, randomize_time=False, M=[0.6, 0.4])
 data = bmmt.simulate()

@@ -1,6 +1,6 @@
 from numpy import cumsum, log, polyfit, sqrt, std, subtract
 from numpy.random import randn
-from fma.rs.rs import RS
+from fractalmarkets.rs.rs import RS
 
 def test_mean_reverting():
     s = log(cumsum(randn(100000))+1000)

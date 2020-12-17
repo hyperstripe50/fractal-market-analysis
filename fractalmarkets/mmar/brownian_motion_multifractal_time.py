@@ -1,6 +1,6 @@
-from fma.mmar.brownian_motion import BrownianMotion
+from fractalmarkets.mmar.brownian_motion import BrownianMotion
 import numpy as np
-from fma.mmar.trading_time_cdf import TradingTimeCDF
+from fractalmarkets.mmar.trading_time_cdf import TradingTimeCDF
 
 class BrownianMotionMultifractalTime(BrownianMotion):
     def __init__(self, k_max, x, y, randomize_time=False, randomize_segments=False, M=[0.6, 0.4]):

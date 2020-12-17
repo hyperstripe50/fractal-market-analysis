@@ -1,11 +1,10 @@
-# fma
+# fractalmarkets
 ## Motivation
 We are hard pressed to find a concrete implementation of both Beniot Mandelbrot's "A Multifractal Model of Asset Returns" and Edgar E. Peters' "Fractal Market Analysis" so, with apologies to the Authors, we attempt to fill this vacancy.
 
 ## Installation
-TODO: make the ```fma``` package available on pypi so that it can be installed by 
 ```
-pip install fma
+pip install fractalmarkets
 ```
 
 ## Features
@@ -16,7 +15,7 @@ The time series simulations are implemented as per Beniot Mandelbrot's descripti
 The rescaled range analysis is implemented as per Edgar E. Peters "Fractal Market Analysis".
 
 ## Simulation Processes
-* fma
+* fractalmarkets
   * mmar
     * BrownianMotion
     * BrownianMotionMultifractalTime
@@ -28,7 +27,7 @@ To simulate timeseries with ```fma```, instantiate the simulation process that y
 
 ### Brownian Motion in Multifractal Time
 ```python
-from fma.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
+from fractalmarkets.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 from scipy import interpolate
 import numpy as np
@@ -65,7 +64,7 @@ plt.show()
 
 ### Brownian Motion
 ```python
-from fma.mmar.brownian_motion import BrownianMotion
+from fractalmarkets.mmar.brownian_motion import BrownianMotion
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 from scipy import interpolate
 import numpy as np
@@ -103,8 +102,8 @@ plt.show()
 
 ### RS Analysis
 ```python
-from fma.rs.rs import RS
-from fma.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
+from fractalmarkets.rs.rs import RS
+from fractalmarkets.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
 
 bmmt = BrownianMotionMultifractalTime(9, x=4/9, y=0.603, randomize_segments=False, randomize_time=False, M=[0.6, 0.4])
 data = bmmt.simulate()
@@ -158,7 +157,7 @@ pip install -e .
 ```javascript
 // from fractal_market_analysis directory
 conda env create -f environment.yml
-conda activate fma
+conda activate fractalmarkets
 ```
 
 ### Run an example

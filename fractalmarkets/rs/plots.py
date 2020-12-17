@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 import numpy as np
 import math
-from fma.rs.metrics import compute_ers
+from fractalmarkets.rs.metrics import compute_ers
 
 def log_log_plot(x,y,H,c,show=True,V_stat=True):
 

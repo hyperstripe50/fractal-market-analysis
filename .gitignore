@@ -6,3 +6,4 @@
 .DS_Store
 **.pyc
 fma.egg-info/
+examples/stock_rs.py

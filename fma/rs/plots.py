@@ -22,7 +22,7 @@ def log_log_plot(x,y,H,c,show=True,V_stat=True):
 
     log_x = np.log10(x)
     log_y = np.log10(y)
-    ax.plot(log_x,log_y,'ro-',label='R/S') #plot empirical line
+    ax.plot(log_x,log_y,'ro-',label='R/S') # plot empirical line
 
     # annotate breaks
     for a,b in zip(log_x, log_y):

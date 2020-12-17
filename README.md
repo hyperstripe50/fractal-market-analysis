@@ -69,9 +69,6 @@ source venv/Scripts/activate
 ```javascript
 // from fractal_market_analysis directory
 pip install -r requirements.txt
-// install individual reqs that do not install well on arm devices
-pip install matplotlib==3.3.1
-pip install scipy==1.5.2
 ```
 
 ### Install our application and watch for edits

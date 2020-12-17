@@ -1,5 +1,5 @@
 import numpy as np
-from fma.mmar.multiplicative_cascade import MutiplicativeCascade
+from fractalmarkets.mmar.multiplicative_cascade import MutiplicativeCascade
 from scipy import interpolate
 
 class TradingTimeCDF:

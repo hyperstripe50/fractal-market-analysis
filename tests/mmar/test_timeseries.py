@@ -1,4 +1,4 @@
-from fma.mmar.multiplicative_cascade import MutiplicativeCascade
+from fractalmarkets.mmar.multiplicative_cascade import MutiplicativeCascade
 
 def test_multiplicative_cascade():
     c = MutiplicativeCascade(1, [0.6, 0.4], False)

@@ -1,4 +1,4 @@
-from fma.rs.metrics import compute_ers
+from fractalmarkets.rs.metrics import compute_ers
 from math import log10
 
 def test_ers():

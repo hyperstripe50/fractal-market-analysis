@@ -1,5 +1,5 @@
-from fma.rs.metrics import get_obv, to_log_returns_series, get_ar1_residuals, get_rs_data, get_Hc
-from fma.rs.plots import log_log_plot
+from fractalmarkets.rs.metrics import get_obv, to_log_returns_series, get_ar1_residuals, get_rs_data, get_Hc
+from fractalmarkets.rs.plots import log_log_plot
 import numpy as np 
 
 class RS:

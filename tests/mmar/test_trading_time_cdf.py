@@ -1,4 +1,4 @@
-from fma.mmar.trading_time_cdf import TradingTimeCDF
+from fractalmarkets.mmar.trading_time_cdf import TradingTimeCDF
 
 def test_diff_at_index_with_pct():
     tradingTime = TradingTimeCDF(1, [0.6, 0.4], randomize=False)

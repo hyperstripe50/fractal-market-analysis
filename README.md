@@ -1,6 +1,6 @@
 # fractalmarkets
 ## Motivation
-We are hard pressed to find a concrete implementation of both Beniot Mandelbrot's "A Multifractal Model of Asset Returns" and Edgar E. Peters' "Fractal Market Analysis" so, with apologies to the Authors, we attempt to fill this vacancy.
+We are hard pressed to find a concrete implementation of both Benoit Mandelbrot's "A Multifractal Model of Asset Returns" and Edgar E. Peters' "Fractal Market Analysis" so, with apologies to the Authors, we attempt to fill this vacancy.
 
 ## Installation
 ```
@@ -10,7 +10,7 @@ pip install fractalmarkets
 ## Features
 This package offers time series simulation processes as well as rescaled range analysis.
 
-The time series simulations are implemented as per Beniot Mandelbrot's description in "A Multifractal Model of Asset Returns", and further elaborated on within "Scaling in financial prices: III. Cartoon Brownian motions in multifractal time". 
+The time series simulations are implemented as per Benoit Mandelbrot's description in "A Multifractal Model of Asset Returns", and further elaborated on within "Scaling in financial prices: III. Cartoon Brownian motions in multifractal time". 
 
 The rescaled range analysis is implemented as per Edgar E. Peters "Fractal Market Analysis".
 

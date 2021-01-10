@@ -28,6 +28,7 @@ To simulate timeseries with ```fractalmarkets```, instantiate the simulation pro
 ### Brownian Motion in Multifractal Time
 ```python
 from fractalmarkets.mmar.brownian_motion_multifractal_time import BrownianMotionMultifractalTime
+import matplotlib
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 from scipy import interpolate
 import numpy as np
@@ -46,7 +47,13 @@ fig, axs = plt.subplots(2)
 fig.suptitle('Brownian Motion in Multifractal Time')
 
 axs[0].plot(x, y, 'b-')
-axs[1].plot(x[:-1], y_diff)
+axs[1].bar(x[:-1],y_diff,align='edge',width=0.001,alpha=0.5)
+bar_list=filter(lambda x: isinstance(x,matplotlib.patches.Rectangle),axs[1].get_children())
+for bar,ret in zip(bar_list,y_diff):
+    if ret >= 0:
+        bar.set_facecolor('green')
+    else:
+        bar.set_facecolor('red')
 
 z1 = np.array(y)
 z2 = np.array([0] * len(y))
@@ -66,6 +73,7 @@ plt.show()
 ### Brownian Motion
 ```python
 from fractalmarkets.mmar.brownian_motion import BrownianMotion
+import matplotlib
 import matplotlib.pyplot as plt; plt.style.use('ggplot')
 from scipy import interpolate
 import numpy as np
@@ -84,7 +92,13 @@ fig, axs = plt.subplots(2)
 fig.suptitle('Brownian Motion')
 
 axs[0].plot(x, y, 'b-')
-axs[1].plot(x[:-1], y_diff)
+axs[1].bar(x[:-1],y_diff,align='edge',width=0.001,alpha=0.5)
+bar_list=filter(lambda x: isinstance(x,matplotlib.patches.Rectangle),axs[1].get_children())
+for bar,ret in zip(bar_list,y_diff):
+    if ret >= 0:
+        bar.set_facecolor('green')
+    else:
+        bar.set_facecolor('red')
 
 z1 = np.array(y)
 z2 = np.array([0] * len(y))
